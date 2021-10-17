@@ -5,6 +5,9 @@ import flixel.util.FlxColor;
 
 class Bullet extends FlxSprite
 {
+	var SPEED = 180;
+	var moveTo:FlxPoint;
+
 	public function new()
 	{
 		super();
@@ -16,7 +19,16 @@ class Bullet extends FlxSprite
 	{
 		this.x = x;
 		this.y = y;
-		FlxVelocity.moveTowardsMouse(this, 180);
-		trace("bullet fired");
+		FlxVelocity.moveTowardsMouse(this, SPEED);
 	}
+
+	public function buddyShoot(angle:Float, point:FlxPoint)
+	{
+		this.x = point.x;
+		this.y = point.y;
+
+		angle -= 90;
+		velocity.set(SPEED, 0);
+		velocity.rotate(FlxPoint.weak(0, 0), angle);
+	}   
 }

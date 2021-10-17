@@ -19,6 +19,7 @@ class PlayState extends FlxState
 	var map:FlxOgmo3Loader;
 	var tilemap:FlxTilemap;
 	var bullets:FlxTypedGroup<Bullet>;
+	var buddyBullets:FlxTypedGroup<Bullet>;
 	var buddies:FlxTypedGroup<Buddy>;
 	var playerVector:Vector2;
 
@@ -42,12 +43,17 @@ class PlayState extends FlxState
 		// helper group for bullets and recycling them
 		bullets = new FlxTypedGroup<Bullet>(30);
 		buddies = new FlxTypedGroup<Buddy>();
+		buddyBullets = new FlxTypedGroup<Bullet>(100);
 
 		map.loadEntities(placeEntities, "ents");
 		
 		add(bullets);
 		add(player); // player goes on top of the tilemap, so add after
 		add(buddies);
+		buddies.forEach((buddy:Buddy) ->
+		{
+			add(buddy.bullets);
+		});
 	}
 
 	function placeEntities(entity:EntityData)
@@ -96,6 +102,10 @@ class PlayState extends FlxState
 		if (mouse.justPressed)
 		{
 			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y);
+			buddies.forEach((buddy:Buddy) ->
+			{
+				buddy.shoot(player.getMidpoint(), mouse.getPosition());
+			});
 		}
 	}
 }
