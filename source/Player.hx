@@ -6,7 +6,7 @@ import flixel.util.FlxColor;
 class Player extends FlxSprite{
     public function new(x, y){
         super(x, y);
-        makeGraphic(30, 30, FlxColor.WHITE);
+		makeGraphic(60, 60, FlxColor.WHITE);
 		maxVelocity = new FlxPoint(200, 200);
 		drag = new FlxPoint(400, 400);
 	}
@@ -17,33 +17,67 @@ class Player extends FlxSprite{
 		keyListeners();
 	}
 
+	// ====== I AM STEALING THIS FROM THE TUTORIAL https://haxeflixel.com/documentation/groundwork/ ======
+	var up:Bool = false;
+	var down:Bool = false;
+	var left:Bool = false;
+	var right:Bool = false;
+	var newAngle:Float;
+	var SPEED:Float = 200;
+    
 	function keyListeners()
 	{
-		if (FlxG.keys.anyPressed([A, LEFT]))
-		{
-			acceleration.x -= 100;
-		}
-		else if (FlxG.keys.anyPressed([D, RIGHT]))
-		{
-			acceleration.x += 100;
-		}
-		else
-		{
-			acceleration.x = 0;
-		}
+		up = FlxG.keys.anyPressed([W, UP]);
+		down = FlxG.keys.anyPressed([S, DOWN]);
+		left = FlxG.keys.anyPressed([A, LEFT]);
+		right = FlxG.keys.anyPressed([D, RIGHT]);
 
-		if (FlxG.keys.anyPressed([W, UP]))
+		// CANCEL OUT THE OPPOSING DIRECTIONS
+		if (up && down)
 		{
-			acceleration.y -= 100;
+			up = down = false;
 		}
-		else if (FlxG.keys.anyPressed([S, DOWN]))
+		if (left && right)
 		{
-			acceleration.y += 100;
+			left = right = false;
 		}
-		else
+		// SET THE VELOCITY ANGLE
+		if (up)
 		{
-			acceleration.y = 0;
+			newAngle = -90;
+			if (left)
+			{
+				newAngle -= 45;
+			}
+			else if (right)
+			{
+				newAngle += 45;
+			}
 		}
+		else if (down)
+		{
+			newAngle = 90;
+			if (left)
+			{
+				newAngle += 45;
+			}
+			else if (right)
+			{
+				newAngle -= 45;
+			}
+		}
+		else if (left)
+		{
+			newAngle = 180;
+		}
+		else if (right)
+		{
+			newAngle = 0;
+		}
+		// APPLY THE PHYSICS
+		velocity.set(SPEED, 0);
+		velocity.rotate(FlxPoint.weak(0, 0), newAngle);
+	    
 	}
 
 	// ====== TRIGONOMETRY AHEAD, HOPE YOU STUDIED HARD IN HIGH SCHOOL ======

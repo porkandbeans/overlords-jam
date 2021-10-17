@@ -1,0 +1,79 @@
+{
+  "name": "Overlords",
+  "ogmoVersion": "3.4.0",
+  "levelPaths": ["."],
+  "backgroundColor": "#282c34ff",
+  "gridColor": "#3c4049cc",
+  "anglesRadians": true,
+  "directoryDepth": 5,
+  "layerGridDefaultSize": {"x": 16, "y": 16},
+  "levelDefaultSize": {"x": 320, "y": 240},
+  "levelMinSize": {"x": 2000, "y": 2000},
+  "levelMaxSize": {"x": 2000, "y": 2000},
+  "levelValues": [],
+  "defaultExportMode": ".json",
+  "compactExport": false,
+  "externalScript": "",
+  "playCommand": "",
+  "entityTags": [],
+  "layers": [
+    {
+      "definition": "tile",
+      "name": "new_layer",
+      "gridSize": {"x": 16, "y": 16},
+      "exportID": "43196629",
+      "exportMode": 0,
+      "arrayMode": 0,
+      "defaultTileset": "New Tileset"
+    },
+    {
+      "definition": "entity",
+      "name": "ents",
+      "gridSize": {"x": 16, "y": 16},
+      "exportID": "43211542",
+      "requiredTags": [],
+      "excludedTags": []
+    }
+  ],
+  "entities": [
+    {
+      "exportID": "43209930",
+      "name": "playerSpawn",
+      "limit": -1,
+      "size": {"x": 16, "y": 16},
+      "origin": {"x": 0, "y": 0},
+      "originAnchored": true,
+      "shape": {
+        "label": "Rectangle",
+        "points": [
+          {"x": -1, "y": -1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": -1},
+          {"x": -1, "y": 1},
+          {"x": 1, "y": 1}
+        ]
+      },
+      "color": "#ff0000ff",
+      "tileX": false,
+      "tileY": false,
+      "tileSize": {"x": 16, "y": 16},
+      "resizeableX": false,
+      "resizeableY": false,
+      "rotatable": false,
+      "rotationDegrees": 360,
+      "canFlipX": false,
+      "canFlipY": false,
+      "canSetColor": false,
+      "hasNodes": false,
+      "nodeLimit": 0,
+      "nodeDisplay": 0,
+      "nodeGhost": true,
+      "tags": [],
+      "values": []
+    }
+  ],
+  "tilesets": [
+    {"label": "New Tileset", "path": "../EXTERMINATION/assets/data/tilewall.png", "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAQCAYAAABQrvyxAAABcGlDQ1BpY2MAACiRdZG9S8NAGMaftkqrVoroIOKQoYpDC0VBHLUOXYqUWsGqS3JNWiFJwyVFiqvg4lBwEF38GvwPdBVcFQRBEURc/Af8WqTE95pCi7R3XN4fT+55uXsO8Kd1Ztg9CcAwHZ5NJaXV/JoUfEcIfQjQHJKZbS1kMml0HT+P8In6EBe9uu/rOAYKqs0AX4h4llncIZ4nTm85luA94hFWkgvEJ8QxTgckvhW64vGb4KLHX4J5LrsI+EVPqdjGShuzEjeIp4ijhl5hzfOIm4RVc2WZ6hitcdjIIoUkJCioYBM6HMSpmpRZZ1+i4VtCmTyMvhaq4OQookTeGKkV6qpS1UhXaeqoitz/52lrM9Ne93AS6H113c8JILgP1Guu+3vquvUzIPACXJstf5lymvsmvdbSosdAZAe4vGlpygFwtQuMPlsylxtSgJZf04CPC2AwDwzfA/3rXlbN/zh/AnLb9ER3wOERMEn7Ixt/YYxnwYxRcy4AAAAJcEhZcwAALiMAAC4jAXilP3YAAADASURBVEhL7ZbLEYAgDESjYw2UQBX0RYNUQxMKB2Yig5KfepHzbsjbxMFlLwcUJ8Z4cuecwTlHrui9J2tHwlXlFporZDspJWEVgOr9BKDvWALRPGoAnKY4ymLkQGDtprl05OXs/2gSM38fmHoC1gFw6/0A3MSqfrYmnJrmE7D6qKkQ5gCji5+EegWAmqZEZw5gud8UIPN3gHLplSaEMLXXfyf8kKknYJU4pflGh7VqgGlkBAGn+R7iFYC7KUmaxxAHYu0v9wJbw+kAAAAASUVORK5CYII=", "tileWidth": 16, "tileHeight": 16, "tileSeparationX": 0, "tileSeparationY": 0, "tileMarginX": 0, "tileMarginY": 0}
+  ]
+}
