@@ -38,7 +38,10 @@
         {"name": "buddy", "id": 10, "_eid": "44521111", "x": 816, "y": 896, "originX": 0, "originY": 0},
         {"name": "buddy", "id": 11, "_eid": "44521111", "x": 624, "y": 848, "originX": 0, "originY": 0},
         {"name": "buddy", "id": 12, "_eid": "44521111", "x": 592, "y": 784, "originX": 0, "originY": 0},
-        {"name": "buddy", "id": 13, "_eid": "44521111", "x": 592, "y": 688, "originX": 0, "originY": 0}
+        {"name": "buddy", "id": 13, "_eid": "44521111", "x": 592, "y": 688, "originX": 0, "originY": 0},
+        {"name": "overlord", "id": 14, "_eid": "50910877", "x": 656, "y": 640, "originX": 0, "originY": 0},
+        {"name": "overlord", "id": 15, "_eid": "50910877", "x": 848, "y": 640, "originX": 0, "originY": 0},
+        {"name": "overlord", "id": 16, "_eid": "50910877", "x": 816, "y": 736, "originX": 0, "originY": 0}
       ]
     }
   ]

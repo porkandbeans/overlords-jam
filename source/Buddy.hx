@@ -9,23 +9,30 @@ enum State
 {
 	IDLE;
 	FOLLOW;
+	EVIL;
 }
 
 class Buddy extends FlxSprite
 {
-	var state(default, null):State;
+	public var state(default, null):State;
+
+	var player:Player;
+	var overlords:FlxTypedGroup<Overlord>;
 	var playerDistance:Float;
 	var playerPos:Vector2;
 	var myPos:Vector2;
+	var master:Overlord;
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
 	public var following:Bool;
 
-	public function new(x, y, _state)
+	public function new(x, y, _player:Player, _overlords:FlxTypedGroup<Overlord>)
 	{
 		super(x, y);
-		state = _state; // param to var
+		player = _player;
+		overlords = _overlords;
+		state = IDLE; // param to var
 		makeGraphic(16, 16, FlxColor.BLUE);
 		loadGraphic("assets/images/buddy.png");
 		myPos = new Vector2();
@@ -35,6 +42,18 @@ class Buddy extends FlxSprite
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		if (state == EVIL)
+		{
+			checkOverlordDistance(master);
+			followOverlord();
+		}
+		else
+		{
+			overlords.forEach((ol) ->
+			{
+				checkOverlordDistance(ol);
+			});
+		}
 	}
 
 	/**
@@ -46,19 +65,33 @@ class Buddy extends FlxSprite
 		why does FlxPoint exist at all? wouldn't it make more sense to use Vector2 instead of extending a whole bunch of children?
 		@param  player  a Vector2 containing the player's co-ordinates (probably converted from a FlxPoint)
 	**/
-	public function checkPlayerDistance(player:Vector2)
+	public function checkPlayerDistance()
 	{
-		myPos.x = this.x;
-		myPos.y = this.y;
-		playerDistance = Vector2.distance(myPos, player);
-		if (playerDistance < 100)
+		playerDistance = getMidpoint().distanceTo(player.getMidpoint());
+		if (state == IDLE && playerDistance < 100)
 		{
 			state = FOLLOW;
 		}
 	}
 
+	//	distance to master
+	var olDistance:Float;
+
+	public function checkOverlordDistance(overlord:Overlord)
+	{
+		// get my own midpoint, then get the distance to the overlord's midpoint
+		olDistance = getMidpoint().distanceTo(overlord.getMidpoint());
+		if (olDistance < 100 && state == IDLE)
+		{
+			state = EVIL;
+			master = overlord;
+		}
+	}
+
 	public function followPlayer(player:FlxPoint)
 	{
+		trace("following player");
+		checkPlayerDistance();
 		if (state == FOLLOW && playerDistance > 50)
 		{
 			FlxVelocity.moveTowardsPoint(this, player, 120);
@@ -70,6 +103,20 @@ class Buddy extends FlxSprite
 		}
 	}
 
+	public function followOverlord()
+	{
+		if (state == EVIL && olDistance > 50)
+		{
+			FlxVelocity.moveTowardsPoint(this, master.getMidpoint());
+		}
+		else if (state == EVIL)
+		{
+			velocity.x = 0;
+			velocity.y = 0;
+		}
+	}
+
+	// angle between the player and the mouse pointer
 	var shootAngle:Float;
 
 	/**

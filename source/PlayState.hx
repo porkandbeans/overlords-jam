@@ -23,6 +23,7 @@ class PlayState extends FlxState
 	var buddies:FlxTypedGroup<Buddy>;
 	var playerVector:Vector2;
 	var activeFollowers:Int;
+	var overlords:FlxTypedGroup<Overlord>;
 
 	override public function create()
 	{
@@ -46,6 +47,8 @@ class PlayState extends FlxState
 		buddies = new FlxTypedGroup<Buddy>();
 		buddyBullets = new FlxGroup();
 
+		overlords = new FlxTypedGroup<Overlord>();
+
 		map.loadEntities(placeEntities, "ents");
 		
 		add(bullets);
@@ -56,6 +59,7 @@ class PlayState extends FlxState
 			add(buddy.bullets);
 			buddyBullets.add(buddy.bullets);
 		});
+		add(overlords);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -67,11 +71,13 @@ class PlayState extends FlxState
 				player.y = entity.y;
 				return;
 			case "buddy":
-				buddies.add(new Buddy(entity.x, entity.y, IDLE));
+				buddies.add(new Buddy(entity.x, entity.y, player, overlords));
+				return;
+			case "overlord":
+				overlords.add(new Overlord(entity.x, entity.y));
 				return;
 		}
 	}
-
 
 	override public function update(elapsed:Float)
 	{
@@ -87,15 +93,14 @@ class PlayState extends FlxState
 			bul.kill();
 		});
 		FlxG.collide(buddies, buddies);
+		FlxG.collide(tilemap, overlords);
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 		shootListen();
-		playerVector.x = player.getMidpoint().x;
-		playerVector.y = player.getMidpoint().y;
 
 		buddies.forEach((buddy:Buddy) ->
 		{
-			buddy.checkPlayerDistance(playerVector);
+			buddy.checkPlayerDistance();
 			buddy.followPlayer(player.getMidpoint());
 			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
 		});
