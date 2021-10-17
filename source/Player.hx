@@ -6,7 +6,7 @@ import flixel.util.FlxColor;
 class Player extends FlxSprite{
     public function new(x, y){
         super(x, y);
-		makeGraphic(60, 60, FlxColor.WHITE);
+		makeGraphic(30, 30, FlxColor.WHITE);
 		maxVelocity = new FlxPoint(200, 200);
 		drag = new FlxPoint(400, 400);
 	}
@@ -32,52 +32,54 @@ class Player extends FlxSprite{
 		left = FlxG.keys.anyPressed([A, LEFT]);
 		right = FlxG.keys.anyPressed([D, RIGHT]);
 
-		// CANCEL OUT THE OPPOSING DIRECTIONS
-		if (up && down)
+		if (up || down || left || right)
 		{
-			up = down = false;
-		}
-		if (left && right)
-		{
-			left = right = false;
-		}
-		// SET THE VELOCITY ANGLE
-		if (up)
-		{
-			newAngle = -90;
-			if (left)
+			// CANCEL OUT THE OPPOSING DIRECTIONS
+			if (up && down)
 			{
-				newAngle -= 45;
+				up = down = false;
+			}
+			if (left && right)
+			{
+				left = right = false;
+			}
+			// SET THE VELOCITY ANGLE
+			if (up)
+			{
+				newAngle = -90;
+				if (left)
+				{
+					newAngle -= 45;
+				}
+				else if (right)
+				{
+					newAngle += 45;
+				}
+			}
+			else if (down)
+			{
+				newAngle = 90;
+				if (left)
+				{
+					newAngle += 45;
+				}
+				else if (right)
+				{
+					newAngle -= 45;
+				}
+			}
+			else if (left)
+			{
+				newAngle = 180;
 			}
 			else if (right)
 			{
-				newAngle += 45;
+				newAngle = 0;
 			}
+			// APPLY THE PHYSICS
+			velocity.set(SPEED, 0);
+			velocity.rotate(FlxPoint.weak(0, 0), newAngle);
 		}
-		else if (down)
-		{
-			newAngle = 90;
-			if (left)
-			{
-				newAngle += 45;
-			}
-			else if (right)
-			{
-				newAngle -= 45;
-			}
-		}
-		else if (left)
-		{
-			newAngle = 180;
-		}
-		else if (right)
-		{
-			newAngle = 0;
-		}
-		// APPLY THE PHYSICS
-		velocity.set(SPEED, 0);
-		velocity.rotate(FlxPoint.weak(0, 0), newAngle);
-	    
 	}
 
 	// ====== TRIGONOMETRY AHEAD, HOPE YOU STUDIED HARD IN HIGH SCHOOL ======
@@ -89,7 +91,7 @@ class Player extends FlxSprite{
 
 	/**
 		makes the player look at the mouse
-		@param	pos1	a FlxPoint containing the location of the mouse cursor
+		@param	mouse	a FlxPoint containing the location of the mouse cursor
 	**/
 	public function getAngleAndRotate(mouse:FlxPoint)
 	{

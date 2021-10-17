@@ -2,6 +2,7 @@ package;
 
 import flixel.FlxG;
 import flixel.FlxG;
+import flixel.FlxObject;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.input.mouse.FlxMouse;
@@ -25,15 +26,34 @@ class PlayState extends FlxState
 		mousePos = new FlxPoint();
 		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/leveldata.json");
 		tilemap = map.loadTilemap("assets/images/tilemap/tiles.png", "new_layer");
+		// declare which blocks are solid and collide with stuff
+		tilemap.setTileProperties(1, FlxObject.NONE);
+		tilemap.setTileProperties(2, FlxObject.ANY);
+
+		map.loadEntities(placeEntities, "ents");
+
 		add(tilemap);
 
 		add(player); // player goes on top of the tilemap, so add after
+	}
+
+	function placeEntities(entity:EntityData)
+	{
+		switch (entity.name)
+		{
+			case "playerSpawn":
+				player.x = entity.x;
+				player.y = entity.y;
+				return;
+		}
 	}
 
 	override public function update(elapsed:Float)
 	{
 		mousePos = mouse.getPosition();
 		player.getAngleAndRotate(mousePos);
+		FlxG.collide(player, tilemap);
+		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 	}
 }
