@@ -18,15 +18,23 @@ class Buddy extends FlxSprite
 	var playerPos:Vector2;
 	var myPos:Vector2;
 
+	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
+	public var following:Bool;
 
 	public function new(x, y, _state)
 	{
 		super(x, y);
 		state = _state; // param to var
 		makeGraphic(16, 16, FlxColor.BLUE);
+		loadGraphic("assets/images/buddy.png");
 		myPos = new Vector2();
 		bullets = new FlxTypedGroup<Bullet>(20);
+	}
+
+	override public function update(elapsed:Float)
+	{
+		super.update(elapsed);
 	}
 
 	/**
@@ -72,13 +80,20 @@ class Buddy extends FlxSprite
 		if (state == FOLLOW)
 		{
 			shootAngle = player.angleBetween(mouse);
-
 			bullets.recycle(Bullet.new).buddyShoot(shootAngle, this.getMidpoint());
 			return shootAngle;
 		}
 		else
 		{
 			return null;
+		}
+	}
+
+	public function rotateAndLookAt(pos1:FlxPoint, pos2:FlxPoint)
+	{
+		if (state == FOLLOW)
+		{
+			angle = pos1.angleBetween(pos2);
 		}
 	}
 

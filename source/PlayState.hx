@@ -19,9 +19,10 @@ class PlayState extends FlxState
 	var map:FlxOgmo3Loader;
 	var tilemap:FlxTilemap;
 	var bullets:FlxTypedGroup<Bullet>;
-	var buddyBullets:FlxTypedGroup<Bullet>;
+	var buddyBullets:FlxGroup;
 	var buddies:FlxTypedGroup<Buddy>;
 	var playerVector:Vector2;
+	var activeFollowers:Int;
 
 	override public function create()
 	{
@@ -43,7 +44,7 @@ class PlayState extends FlxState
 		// helper group for bullets and recycling them
 		bullets = new FlxTypedGroup<Bullet>(30);
 		buddies = new FlxTypedGroup<Buddy>();
-		buddyBullets = new FlxTypedGroup<Bullet>(100);
+		buddyBullets = new FlxGroup();
 
 		map.loadEntities(placeEntities, "ents");
 		
@@ -53,6 +54,7 @@ class PlayState extends FlxState
 		buddies.forEach((buddy:Buddy) ->
 		{
 			add(buddy.bullets);
+			buddyBullets.add(buddy.bullets);
 		});
 	}
 
@@ -80,6 +82,10 @@ class PlayState extends FlxState
 		{
 			bul.kill();
 		});
+		FlxG.collide(buddyBullets, tilemap, (bul, til) ->
+		{
+			bul.kill();
+		});
 		FlxG.collide(buddies, buddies);
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
@@ -91,6 +97,7 @@ class PlayState extends FlxState
 		{
 			buddy.checkPlayerDistance(playerVector);
 			buddy.followPlayer(player.getMidpoint());
+			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
 		});
 	}
 

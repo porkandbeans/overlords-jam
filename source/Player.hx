@@ -1,13 +1,12 @@
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
-import flixel.util.FlxColor;
 
 class Player extends FlxSprite{
     public function new(x, y){
         super(x, y);
-		makeGraphic(30, 30, FlxColor.WHITE);
-		maxVelocity = new FlxPoint(200, 200);
+		loadGraphic("assets/images/overlord.png");
+		maxVelocity = new FlxPoint(2000, 2000);
 		drag = new FlxPoint(400, 400);
 	}
 
@@ -23,7 +22,9 @@ class Player extends FlxSprite{
 	var left:Bool = false;
 	var right:Bool = false;
 	var newAngle:Float;
-	var SPEED:Float = 200;
+	var baseSpeed = 200;
+
+	public var SPEED:Float = 200;
     
 	function keyListeners()
 	{
@@ -95,8 +96,8 @@ class Player extends FlxSprite{
 	**/
 	public function getAngleAndRotate(mouse:FlxPoint)
 	{
-		xdistance = this.x - mouse.x;
-		ydistance = this.y - mouse.y;
+		xdistance = getMidpoint().x - mouse.x;
+		ydistance = getMidpoint().y - mouse.y;
 
 		// pythagorean theorum (a^2 + b^2 = c^2)
 		c2 = ((xdistance * xdistance) + (ydistance * ydistance));
@@ -108,5 +109,10 @@ class Player extends FlxSprite{
 		toDegs = 180 / Math.PI * Math.atan2(ydistance, xdistance);
 
 		set_angle(toDegs); // NOW LOOK AT IT!!!
+	}
+	public function speedBuff()
+	{
+		SPEED += 20;
+		trace(SPEED);
 	}
 }
