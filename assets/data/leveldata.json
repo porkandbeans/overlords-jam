@@ -29,7 +29,16 @@
       "gridCellsX": 125,
       "gridCellsY": 125,
       "entities": [
-        {"name": "playerSpawn", "id": 0, "_eid": "43209930", "x": 768, "y": 976, "originX": 0, "originY": 0}
+        {"name": "playerSpawn", "id": 0, "_eid": "43209930", "x": 768, "y": 976, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 4, "_eid": "44521111", "x": 928, "y": 704, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 6, "_eid": "44521111", "x": 864, "y": 704, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 7, "_eid": "44521111", "x": 752, "y": 704, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 8, "_eid": "44521111", "x": 736, "y": 768, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 9, "_eid": "44521111", "x": 848, "y": 816, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 10, "_eid": "44521111", "x": 816, "y": 896, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 11, "_eid": "44521111", "x": 624, "y": 848, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 12, "_eid": "44521111", "x": 592, "y": 784, "originX": 0, "originY": 0},
+        {"name": "buddy", "id": 13, "_eid": "44521111", "x": 592, "y": 688, "originX": 0, "originY": 0}
       ]
     }
   ]

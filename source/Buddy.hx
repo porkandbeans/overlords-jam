@@ -1,13 +1,56 @@
 import flixel.FlxSprite;
+import flixel.math.FlxPoint;
+import flixel.math.FlxVelocity;
+import flixel.util.FlxColor;
+import lime.math.Vector2;
+
+enum State
+{
+	IDLE;
+	FOLLOW;
+}
 
 class Buddy extends FlxSprite
 {
-	/**
-		TODO:
-			give these dudes an ENUM and a state, change their state from IDLE to FOLLOW
-			when the player moves nearby (use Vector2 to check distance)
+	var state(default, null):State;
+	var playerDistance:Float;
+	var playerPos:Vector2;
+	var myPos:Vector2;
 
-			when they follow the player, they should also shoot bullets at the mouse cursor
-			if you want to get real fancy, make them shoot in the DIRECTION that the player's bullet is going for a wide spread
+	public function new(x, y, _state)
+	{
+		super(x, y);
+		state = _state; // param to var
+		makeGraphic(16, 16, FlxColor.BLUE);
+		myPos = new Vector2();
+	}
+
+	/**
+		Check distance to player, and change state to FOLLOW if close enough
+		@param  player  a Vector2 containing the player's co-ordinates (probably converted from a FlxPoint)
 	**/
+	public function checkPlayerDistance(player:Vector2)
+	{
+		myPos.x = this.x;
+		myPos.y = this.y;
+		playerDistance = Vector2.distance(myPos, player);
+		if (playerDistance < 100)
+		{
+			state = FOLLOW;
+		}
+	}
+
+	public function followPlayer(player:FlxPoint)
+	{
+		if (state == FOLLOW && playerDistance > 50)
+		{
+			FlxVelocity.moveTowardsPoint(this, player, 120);
+		}
+		else if (state == FOLLOW)
+		{
+			velocity.x = 0;
+			velocity.y = 0;
+		}
+	}
+
 }

@@ -9,6 +9,7 @@ import flixel.group.FlxGroup;
 import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import lime.math.Vector2;
 
 class PlayState extends FlxState
 {
@@ -18,11 +19,14 @@ class PlayState extends FlxState
 	var map:FlxOgmo3Loader;
 	var tilemap:FlxTilemap;
 	var bullets:FlxTypedGroup<Bullet>;
+	var buddies:FlxTypedGroup<Buddy>;
+	var playerVector:Vector2;
 
 	override public function create()
 	{
 		super.create();
 		player = new Player(FlxG.width / 2, FlxG.height / 2);
+		playerVector = new Vector2(); // defined in update()
 
 		mouse = FlxG.mouse;
 		mousePos = new FlxPoint();
@@ -35,13 +39,15 @@ class PlayState extends FlxState
 		tilemap.setTileProperties(1, FlxObject.NONE);
 		tilemap.setTileProperties(2, FlxObject.ANY);
 
-		map.loadEntities(placeEntities, "ents");
-
 		// helper group for bullets and recycling them
 		bullets = new FlxTypedGroup<Bullet>(30);
+		buddies = new FlxTypedGroup<Buddy>();
+
+		map.loadEntities(placeEntities, "ents");
 		
 		add(bullets);
 		add(player); // player goes on top of the tilemap, so add after
+		add(buddies);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -52,8 +58,12 @@ class PlayState extends FlxState
 				player.x = entity.x;
 				player.y = entity.y;
 				return;
+			case "buddy":
+				buddies.add(new Buddy(entity.x, entity.y, IDLE));
+				return;
 		}
 	}
+
 
 	override public function update(elapsed:Float)
 	{
@@ -64,9 +74,18 @@ class PlayState extends FlxState
 		{
 			bul.kill();
 		});
+		FlxG.collide(buddies, buddies);
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 		shootListen();
+		playerVector.x = player.getMidpoint().x;
+		playerVector.y = player.getMidpoint().y;
+
+		buddies.forEach((buddy:Buddy) ->
+		{
+			buddy.checkPlayerDistance(playerVector);
+			buddy.followPlayer(player.getMidpoint());
+		});
 	}
 
 	/**
