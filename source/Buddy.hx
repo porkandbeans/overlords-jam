@@ -49,9 +49,11 @@ class Buddy extends FlxSprite
 		super.update(elapsed);
 		if (state == EVIL && master.alive == false)
 		{
+			// oh no, my master is dead!
 			overlords.remove(master);
 			master = null;
 			state = IDLE;
+			health = 3;
 			loadGraphic("assets/images/buddy.png");
 			velocity.x = 0;
 			velocity.y = 0;
@@ -141,7 +143,7 @@ class Buddy extends FlxSprite
 	**/
 	public function shoot(player:FlxPoint, mouse:FlxPoint)
 	{
-		if (state == FOLLOW)
+		if (state == FOLLOW && alive)
 		{
 			shootAngle = player.angleBetween(mouse);
 			myMidpoint = getMidpoint();

@@ -30,6 +30,8 @@ class PlayState extends FlxState
 	var buddyBadBullets:FlxGroup; // contains only enemy buddy bullets
 	var hud:Hud;
 	var hearts:FlxTypedGroup<Heart>;
+	var buddySpawns:FlxTypedGroup<BuddySpawn>;
+	var overlordSpawns:FlxTypedGroup<OverlordSpawn>;
 
 	override public function create()
 	{
@@ -39,7 +41,7 @@ class PlayState extends FlxState
 
 		mouse = FlxG.mouse;
 		mousePos = new FlxPoint();
-		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/leveldata.json");
+		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/arena.json");
 		FlxG.collide(player, tilemap);
 		FlxG.collide(bullets, tilemap, (bul, til) ->
 		{
@@ -79,6 +81,8 @@ class PlayState extends FlxState
 		badBullets = new FlxGroup();
 		buddyBadBullets = new FlxGroup();
 		hearts = new FlxTypedGroup<Heart>();
+		buddySpawns = new FlxTypedGroup<BuddySpawn>();
+		overlordSpawns = new FlxTypedGroup<OverlordSpawn>();
 
 		overlords = new FlxTypedGroup<Overlord>();
 
@@ -92,23 +96,35 @@ class PlayState extends FlxState
 		add(buddies);
 		buddies.forEach((buddy:Buddy) ->
 		{
-			add(buddy.bullets);
-			add(buddy.badBullets);
-			buddyBullets.add(buddy.bullets);
-			buddyBadBullets.add(buddy.badBullets);
-			badBullets.add(buddy.badBullets);
-			bulletsg.add(buddy.bullets);
+			addBuddyBullets(buddy);
 		});
 		add(overlords);
 		overlords.forEach((ols) ->
 		{
-			var baddieBullets = new FlxTypedGroup<BadBullet>();
-			ols.loadBullets(baddieBullets);
-			add(baddieBullets);
-			badBullets.add(baddieBullets);
+			instanceOlBulls(ols);
 		});
 		add(hearts);
+		add(buddySpawns);
+		add(overlordSpawns);
 		add(hud);
+	}
+
+	function addBuddyBullets(buddy:Buddy)
+	{
+		add(buddy.bullets);
+		add(buddy.badBullets);
+		buddyBullets.add(buddy.bullets);
+		buddyBadBullets.add(buddy.badBullets);
+		badBullets.add(buddy.badBullets);
+		bulletsg.add(buddy.bullets);
+	}
+
+	function instanceOlBulls(ol:Overlord)
+	{
+		var baddieBullets = new FlxTypedGroup<BadBullet>();
+		ol.loadBullets(baddieBullets);
+		add(baddieBullets);
+		badBullets.add(baddieBullets);
 	}
 
 	function placeEntities(entity:EntityData)
@@ -125,9 +141,15 @@ class PlayState extends FlxState
 			case "overlord":
 				overlords.add(new Overlord(entity.x, entity.y, player));
 				return;
+			case "buddySpawn":
+				buddySpawns.add(new BuddySpawn(entity.x, entity.y, player, overlords));
+				return;
+			case "overlordSpawn":
+				overlordSpawns.add(new OverlordSpawn(entity.x, entity.y, player));
+				return;
 		}
 	}
-
+	var buddyMult:Int;
 	override public function update(elapsed:Float)
 	{
 		mousePos = mouse.getPosition();
@@ -136,12 +158,37 @@ class PlayState extends FlxState
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 		shootListen();
-
+		buddyMult = 0;
 		buddies.forEach((buddy:Buddy) ->
 		{
 			buddy.checkPlayerDistance();
 			buddy.followPlayer(player.getMidpoint());
 			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
+			if (buddy.alive && buddy.state == FOLLOW)
+			{
+				buddyMult++;
+			}
+		});
+		// set multiplier equal to the number of following buddies
+		hud.setMult(buddyMult);
+
+		buddySpawns.forEach((spawner) ->
+		{
+			if (spawner.getBuddy() != null)
+			{
+				buddies.add(spawner.getBuddy());
+				addBuddyBullets(spawner.getBuddy());
+			}
+		});
+
+		overlordSpawns.forEach((olSpawn) ->
+		{
+			if (olSpawn.getOverlord() != null)
+			{
+				overlords.add(olSpawn.getOverlord());
+				instanceOlBulls(olSpawn.getOverlord());
+				olSpawn.done();
+			}
 		});
 
 		gameOverCheck();
@@ -151,7 +198,16 @@ class PlayState extends FlxState
 	{
 		if (player.health <= 0)
 		{
-			FlxG.switchState(new PlayState());
+			player.kill();
+			buddies.forEach((bud) ->
+			{
+				if (bud.state == FOLLOW)
+				{
+					bud.kill();
+				}
+
+				hud.gameOver();
+			});
 		}
 	}
 
@@ -210,6 +266,7 @@ class PlayState extends FlxState
 				bul.kill();
 				if (!ol.alive)
 				{
+					hud.incScore(2);
 					if (Random.int(0, 3) == 3)
 					{
 						var heart = new Heart(pos.x, pos.y);
@@ -223,6 +280,18 @@ class PlayState extends FlxState
 		{
 			ht.get(pl);
 			hud.updateBar(pl.health);
+		});
+		FlxG.overlap(buddies, badBullets, (bud, bul) ->
+		{
+			if (bud.state == FOLLOW)
+			{
+				bul.kill();
+				bud.health--;
+				if (bud.health <= 0)
+				{
+					bud.kill();
+				}
+			}
 		});
 	}
 

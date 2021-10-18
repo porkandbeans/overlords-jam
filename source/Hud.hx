@@ -4,14 +4,20 @@ import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
+import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
 
 class Hud extends FlxTypedGroup<FlxSprite>
 {
 	var healthBar:FlxBar;
 	var playerHealth:Int;
-
-	// var testText:FlxText;
+	var score:Int = 0;
+	var scoreText:FlxText;
+	var multiplier:Int;
+	var multText:FlxText;
+	var gameOverText:FlxText;
+	var scoreDesc:FlxText;
+	var replayButt:FlxButton;
 
 	public function new()
 	{
@@ -21,6 +27,25 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		healthBar.createFilledBar(null, FlxColor.GREEN, true, FlxColor.BLACK);
 		healthBar.alpha = 0;
 		add(healthBar);
+		scoreText = new FlxText(0, FlxG.height - 30, FlxG.width, Std.string(score), 10);
+		add(scoreText);
+		multText = new FlxText(0, FlxG.height - 15, FlxG.width, "x" + Std.string(multiplier), 10);
+		add(multText);
+
+		gameOverText = new FlxText(FlxG.width / 2 - 100, FlxG.height / 2 - 20, FlxG.width, "GAME OVER", 30);
+		add(gameOverText);
+		gameOverText.visible = false;
+		scoreDesc = new FlxText(gameOverText.x, gameOverText.y + 30, FlxG.width, "Your score is: ", 10);
+		add(scoreDesc);
+		scoreDesc.visible = false;
+
+		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "Play again", () ->
+		{
+			FlxG.switchState(new PlayState());
+		});
+		add(replayButt);
+		replayButt.visible = false;
+
 
 		forEach((sprite) ->
 		{
@@ -41,5 +66,33 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		{
 			FlxTween.tween(healthBar, {alpha: 0}, 0.33);
 		}
+	}
+	public function incScore(add:Int)
+	{
+		score += (add * multiplier);
+		scoreText.text = Std.string(score);
+	}
+
+	public function setMult(mult:Int)
+	{
+		if (mult == 0 || mult == null)
+		{
+			mult = 1;
+		}
+		multiplier = mult;
+		multText.text = "x" + Std.string(multiplier);
+	}
+
+	public function gameOver()
+	{
+		gameOverText.visible = true;
+		scoreDesc.visible = true;
+		healthBar.visible = false;
+		multText.visible = false;
+
+		scoreText.x = scoreDesc.x + 90;
+		scoreText.y = scoreDesc.y;
+
+		replayButt.visible = true;
 	}
 }
