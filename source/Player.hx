@@ -5,7 +5,7 @@ import flixel.math.FlxPoint;
 class Player extends FlxSprite{
     public function new(x, y){
         super(x, y);
-		loadGraphic("assets/images/overlord.png");
+		loadGraphic("assets/images/player.png");
 		maxVelocity = new FlxPoint(2000, 2000);
 		drag = new FlxPoint(400, 400);
 	}

@@ -71,6 +71,7 @@ class Buddy extends FlxSprite
 		if (state == IDLE && playerDistance < 100)
 		{
 			state = FOLLOW;
+			loadGraphic("assets/images/buddy_follow.png");
 		}
 	}
 
@@ -84,6 +85,7 @@ class Buddy extends FlxSprite
 		if (olDistance < 100 && state == IDLE)
 		{
 			state = EVIL;
+			loadGraphic("assets/images/buddy_evil.png");
 			master = overlord;
 		}
 	}

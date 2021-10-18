@@ -24,6 +24,7 @@ class PlayState extends FlxState
 	var playerVector:Vector2;
 	var activeFollowers:Int;
 	var overlords:FlxTypedGroup<Overlord>;
+	var badBullets:FlxGroup;
 
 	override public function create()
 	{
@@ -46,6 +47,7 @@ class PlayState extends FlxState
 		bullets = new FlxTypedGroup<Bullet>(30);
 		buddies = new FlxTypedGroup<Buddy>();
 		buddyBullets = new FlxGroup();
+		badBullets = new FlxGroup();
 
 		overlords = new FlxTypedGroup<Overlord>();
 
@@ -60,6 +62,13 @@ class PlayState extends FlxState
 			buddyBullets.add(buddy.bullets);
 		});
 		add(overlords);
+		overlords.forEach((ols) ->
+		{
+			var baddieBullets = new FlxTypedGroup<BadBullet>();
+			ols.loadBullets(baddieBullets);
+			add(baddieBullets);
+			badBullets.add(baddieBullets);
+		});
 	}
 
 	function placeEntities(entity:EntityData)
@@ -74,7 +83,7 @@ class PlayState extends FlxState
 				buddies.add(new Buddy(entity.x, entity.y, player, overlords));
 				return;
 			case "overlord":
-				overlords.add(new Overlord(entity.x, entity.y));
+				overlords.add(new Overlord(entity.x, entity.y, player));
 				return;
 		}
 	}
@@ -89,6 +98,10 @@ class PlayState extends FlxState
 			bul.kill();
 		});
 		FlxG.collide(buddyBullets, tilemap, (bul, til) ->
+		{
+			bul.kill();
+		});
+		FlxG.collide(tilemap, badBullets, (til, bul) ->
 		{
 			bul.kill();
 		});
@@ -113,7 +126,7 @@ class PlayState extends FlxState
 	{
 		if (mouse.justPressed)
 		{
-			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y);
+			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
 			buddies.forEach((buddy:Buddy) ->
 			{
 				buddy.shoot(player.getMidpoint(), mouse.getPosition());
