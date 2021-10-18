@@ -1,3 +1,4 @@
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
@@ -23,6 +24,7 @@ class Buddy extends FlxSprite
 	var myPos:Vector2;
 	var master:Overlord;
 	var myMidpoint:FlxPoint;
+	var mouse = FlxG.mouse;
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
@@ -47,6 +49,7 @@ class Buddy extends FlxSprite
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		myMidpoint = getMidpoint();
 		if (state == EVIL && master.alive == false)
 		{
 			// oh no, my master is dead!
@@ -69,6 +72,47 @@ class Buddy extends FlxSprite
 			{
 				checkOverlordDistance(ol);
 			});
+		}
+		updateSprite();
+	}
+
+	function updateSprite()
+	{
+		if (state == EVIL)
+		{
+			if (health == 3)
+			{
+				loadGraphic("assets/images/buddy_evil.png");
+				return;
+			}
+			else if (health == 2)
+			{
+				loadGraphic("assets/images/buddy_evil_2.png");
+				return;
+			}
+			else if (health == 1)
+			{
+				loadGraphic("assets/images/buddy_evil_1.png");
+				return;
+			}
+		}
+		else if (state == FOLLOW)
+		{
+			if (health == 3)
+			{
+				loadGraphic("assets/images/buddy_follow.png");
+				return;
+			}
+			else if (health == 2)
+			{
+				loadGraphic("assets/images/buddy_follow_1.png");
+				return;
+			}
+			else
+			{
+				loadGraphic("assets/images/buddy_follow_2.png");
+				return;
+			}
 		}
 	}
 
@@ -141,16 +185,24 @@ class Buddy extends FlxSprite
 	/**
 		returns an angle:Float between the player and the mouse if following, and null if not
 	**/
-	public function shoot(player:FlxPoint, mouse:FlxPoint)
+	public function shoot(_player:FlxPoint, mouse:FlxPoint)
 	{
 		if (state == FOLLOW && alive)
 		{
-			shootAngle = player.angleBetween(mouse);
-			myMidpoint = getMidpoint();
 			var bullet = bullets.recycle(Bullet.new);
-			bullet.reset(myMidpoint.x, myMidpoint.y);
-			bullet.buddyShoot(shootAngle);
-			return shootAngle;
+			if (!player.slow)
+			{
+				shootAngle = _player.angleBetween(mouse);
+				bullet.reset(myMidpoint.x, myMidpoint.y);
+				bullet.buddyShoot(shootAngle);
+				return shootAngle;
+			}
+			else
+			{
+				bullet.shoot(myMidpoint.x, myMidpoint.y, null);
+				return null;
+			}
+			
 		}
 		else if (state == EVIL)
 		{
@@ -166,7 +218,15 @@ class Buddy extends FlxSprite
 	{
 		if (state == FOLLOW)
 		{
-			angle = pos1.angleBetween(pos2);
+			if (!player.slow)
+			{
+				angle = pos1.angleBetween(pos2);
+			}
+			else
+			{
+				angle = myMidpoint.angleBetween(mouse.getPosition());
+			}
+			
 		}
 	}
 
@@ -177,7 +237,6 @@ class Buddy extends FlxSprite
 
 	public function badShoot(_ang:Float)
 	{
-		myMidpoint = getMidpoint();
 		// recycle a new BadBullet from the group, call buddyShoot on it and give it the angle and my midPoint
 		var bullet = badBullets.recycle(BadBullet.new);
 		bullet.reset(myMidpoint.x, myMidpoint.y);

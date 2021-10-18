@@ -278,8 +278,12 @@ class PlayState extends FlxState
 		});
 		FlxG.overlap(player, hearts, (pl:Player, ht:Heart) ->
 		{
-			ht.get(pl);
-			hud.updateBar(pl.health);
+			if (player.health < 20)
+			{
+				ht.get(pl);
+				hud.updateBar(pl.health);
+			}
+			
 		});
 		FlxG.overlap(buddies, badBullets, (bud, bul) ->
 		{

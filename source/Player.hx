@@ -22,7 +22,7 @@ class Player extends FlxSprite{
 	var down:Bool = false;
 	var left:Bool = false;
 	var right:Bool = false;
-	var slow:Bool = false;
+	public var slow:Bool = false;
 	var newAngle:Float;
 	var baseSpeed = 200;
 
@@ -121,9 +121,9 @@ class Player extends FlxSprite{
 
 		set_angle(toDegs); // NOW LOOK AT IT!!!
 	}
-	public function speedBuff()
+	/*public function speedBuff()
 	{
 		SPEED += 20;
 		trace(SPEED);
-	}
+	}*/
 }

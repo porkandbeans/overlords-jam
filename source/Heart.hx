@@ -11,6 +11,10 @@ class Heart extends FlxSprite
 	public function get(pl:Player)
 	{
 		pl.health += 8;
+		if (pl.health > 20)
+		{
+			pl.health = 20;
+		}
 		kill();
 	}
 }
