@@ -96,7 +96,10 @@ class Overlord extends FlxSprite
 				bullets.recycle(BadBullet.new).shoot(getMidpoint().x, getMidpoint().y, player.getMidpoint());
 				buddies.forEach((bud) ->
 				{
-					bud.badShoot(buddyAngle);
+					if (bud.alive)
+					{
+						bud.badShoot(buddyAngle);
+					}
 				});
 				canShoot = false;
 				shootTimer.start(1, (timer) ->

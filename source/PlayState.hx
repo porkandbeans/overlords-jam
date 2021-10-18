@@ -29,6 +29,7 @@ class PlayState extends FlxState
 	var badBullets:FlxGroup; // contains both evil buddy bullets and overlord bullets
 	var buddyBadBullets:FlxGroup; // contains only enemy buddy bullets
 	var hud:Hud;
+	var hearts:FlxTypedGroup<Heart>;
 
 	override public function create()
 	{
@@ -77,6 +78,7 @@ class PlayState extends FlxState
 		buddyBullets = new FlxGroup();
 		badBullets = new FlxGroup();
 		buddyBadBullets = new FlxGroup();
+		hearts = new FlxTypedGroup<Heart>();
 
 		overlords = new FlxTypedGroup<Overlord>();
 
@@ -105,6 +107,7 @@ class PlayState extends FlxState
 			add(baddieBullets);
 			badBullets.add(baddieBullets);
 		});
+		add(hearts);
 		add(hud);
 	}
 
@@ -189,7 +192,11 @@ class PlayState extends FlxState
 			{
 				// trace("evil buddy just shot by friendly bullet");
 				bul.kill();
-				bud.kill();
+				bud.health--;
+				if (bud.health <= 0)
+				{
+					bud.kill();
+				}
 			}
 		});
 
@@ -197,10 +204,25 @@ class PlayState extends FlxState
 		{
 			if (bul.shooting)
 			{
+				var pos = new Vector2(ol.x, ol.y);
 				// trace("overlord just shot by friendly bullet");
 				ol.shot();
 				bul.kill();
+				if (!ol.alive)
+				{
+					if (Random.int(0, 3) == 3)
+					{
+						var heart = new Heart(pos.x, pos.y);
+						add(heart);
+						hearts.add(heart);
+					}
+				}
 			}
+		});
+		FlxG.overlap(player, hearts, (pl:Player, ht:Heart) ->
+		{
+			ht.get(pl);
+			hud.updateBar(pl.health);
 		});
 	}
 

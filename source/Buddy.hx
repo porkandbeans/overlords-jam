@@ -41,17 +41,22 @@ class Buddy extends FlxSprite
 		bullets = new FlxTypedGroup<Bullet>(20);
 		badBullets = new FlxTypedGroup<BadBullet>(10);
 		myMidpoint = new FlxPoint();
+		health = 3;
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if (master == null && state == EVIL)
+		if (state == EVIL && master.alive == false)
 		{
+			overlords.remove(master);
+			master = null;
 			state = IDLE;
+			loadGraphic("assets/images/buddy.png");
+			velocity.x = 0;
+			velocity.y = 0;
 		}
-
-		if (state == EVIL)
+		else if (state == EVIL)
 		{
 			checkOverlordDistance(master);
 			followOverlord();
