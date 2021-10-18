@@ -26,16 +26,15 @@ class Bullet extends FlxSprite
 	{
 		this.x = x;
 		this.y = y;
+		alive = true;
 		FlxVelocity.moveTowardsMouse(this, SPEED);
 	}
 
-	public function buddyShoot(angle:Float, point:FlxPoint)
+	public function buddyShoot(angle:Float)
 	{
-		this.x = point.x;
-		this.y = point.y;
-
+		alive = true;
 		angle -= 90;
 		velocity.set(SPEED, 0);
 		velocity.rotate(FlxPoint.weak(0, 0), angle);
-	}   
+	}
 }

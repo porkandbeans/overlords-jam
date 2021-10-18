@@ -37,6 +37,7 @@ class Overlord extends FlxSprite
 		}, 0);
 		player = _player;
 		buddies = new FlxTypedGroup<Buddy>();
+		health = 20;
 	}
 
 	public function loadBullets(_bulls:FlxTypedGroup<BadBullet>)
@@ -98,7 +99,7 @@ class Overlord extends FlxSprite
 					bud.badShoot(buddyAngle);
 				});
 				canShoot = false;
-				shootTimer.start(0.5, (timer) ->
+				shootTimer.start(1, (timer) ->
 				{
 					canShoot = true;
 				});
@@ -127,6 +128,14 @@ class Overlord extends FlxSprite
 		toDegs = 180 / Math.PI * Math.atan2(ydistance, xdistance);
 
 		set_angle(toDegs + 180); // NOW LOOK AT IT!!!
+	}
+	public function shot()
+	{
+		health--;
+		if (health <= 0)
+		{
+			kill();
+		}
 	}
 	var canShoot:Bool = true;
 }

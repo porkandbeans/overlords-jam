@@ -22,6 +22,7 @@ class Buddy extends FlxSprite
 	var playerPos:Vector2;
 	var myPos:Vector2;
 	var master:Overlord;
+	var myMidpoint:FlxPoint;
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
@@ -39,11 +40,17 @@ class Buddy extends FlxSprite
 		myPos = new Vector2();
 		bullets = new FlxTypedGroup<Bullet>(20);
 		badBullets = new FlxTypedGroup<BadBullet>(10);
+		myMidpoint = new FlxPoint();
 	}
 
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
+		if (master == null && state == EVIL)
+		{
+			state = IDLE;
+		}
+
 		if (state == EVIL)
 		{
 			checkOverlordDistance(master);
@@ -132,7 +139,10 @@ class Buddy extends FlxSprite
 		if (state == FOLLOW)
 		{
 			shootAngle = player.angleBetween(mouse);
-			bullets.recycle(Bullet.new).buddyShoot(shootAngle, this.getMidpoint());
+			myMidpoint = getMidpoint();
+			var bullet = bullets.recycle(Bullet.new);
+			bullet.reset(myMidpoint.x, myMidpoint.y);
+			bullet.buddyShoot(shootAngle);
 			return shootAngle;
 		}
 		else if (state == EVIL)
@@ -160,8 +170,11 @@ class Buddy extends FlxSprite
 
 	public function badShoot(_ang:Float)
 	{
+		myMidpoint = getMidpoint();
 		// recycle a new BadBullet from the group, call buddyShoot on it and give it the angle and my midPoint
-		badBullets.recycle(BadBullet.new).buddyShoot(_ang, getMidpoint());
+		var bullet = badBullets.recycle(BadBullet.new);
+		bullet.reset(myMidpoint.x, myMidpoint.y);
+		bullet.buddyShoot(_ang);
 	}
 
 }

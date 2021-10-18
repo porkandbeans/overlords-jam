@@ -8,6 +8,7 @@ class Player extends FlxSprite{
 		loadGraphic("assets/images/player.png");
 		maxVelocity = new FlxPoint(2000, 2000);
 		drag = new FlxPoint(400, 400);
+		health = 20;
 	}
 
 	override public function update(elapsed:Float)
