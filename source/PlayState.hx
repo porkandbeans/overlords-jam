@@ -25,6 +25,7 @@ class PlayState extends FlxState
 	var activeFollowers:Int;
 	var overlords:FlxTypedGroup<Overlord>;
 	var badBullets:FlxGroup;
+	var buddyBadBullets:FlxGroup;
 
 	override public function create()
 	{
@@ -48,6 +49,7 @@ class PlayState extends FlxState
 		buddies = new FlxTypedGroup<Buddy>();
 		buddyBullets = new FlxGroup();
 		badBullets = new FlxGroup();
+		buddyBadBullets = new FlxGroup();
 
 		overlords = new FlxTypedGroup<Overlord>();
 
@@ -59,7 +61,9 @@ class PlayState extends FlxState
 		buddies.forEach((buddy:Buddy) ->
 		{
 			add(buddy.bullets);
+			add(buddy.badBullets);
 			buddyBullets.add(buddy.bullets);
+			buddyBadBullets.add(buddy.badBullets);
 		});
 		add(overlords);
 		overlords.forEach((ols) ->
@@ -102,6 +106,10 @@ class PlayState extends FlxState
 			bul.kill();
 		});
 		FlxG.collide(tilemap, badBullets, (til, bul) ->
+		{
+			bul.kill();
+		});
+		FlxG.collide(tilemap, buddyBadBullets, (til, bul) ->
 		{
 			bul.kill();
 		});

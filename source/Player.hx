@@ -21,6 +21,7 @@ class Player extends FlxSprite{
 	var down:Bool = false;
 	var left:Bool = false;
 	var right:Bool = false;
+	var slow:Bool = false;
 	var newAngle:Float;
 	var baseSpeed = 200;
 
@@ -32,6 +33,7 @@ class Player extends FlxSprite{
 		down = FlxG.keys.anyPressed([S, DOWN]);
 		left = FlxG.keys.anyPressed([A, LEFT]);
 		right = FlxG.keys.anyPressed([D, RIGHT]);
+		slow = FlxG.keys.anyPressed([SHIFT, SPACE]);
 
 		if (up || down || left || right)
 		{
@@ -80,6 +82,14 @@ class Player extends FlxSprite{
 			// APPLY THE PHYSICS
 			velocity.set(SPEED, 0);
 			velocity.rotate(FlxPoint.weak(0, 0), newAngle);
+		}
+		if (slow)
+		{
+			SPEED = 100;
+		}
+		else
+		{
+			SPEED = 200;
 		}
 	}
 

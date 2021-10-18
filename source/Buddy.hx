@@ -25,6 +25,7 @@ class Buddy extends FlxSprite
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
+	public var badBullets:FlxTypedGroup<BadBullet>;
 	public var following:Bool;
 
 	public function new(x, y, _player:Player, _overlords:FlxTypedGroup<Overlord>)
@@ -37,6 +38,7 @@ class Buddy extends FlxSprite
 		loadGraphic("assets/images/buddy.png");
 		myPos = new Vector2();
 		bullets = new FlxTypedGroup<Bullet>(20);
+		badBullets = new FlxTypedGroup<BadBullet>(10);
 	}
 
 	override public function update(elapsed:Float)
@@ -87,12 +89,13 @@ class Buddy extends FlxSprite
 			state = EVIL;
 			loadGraphic("assets/images/buddy_evil.png");
 			master = overlord;
+			master.addBuddy(this);
 		}
 	}
 
 	public function followPlayer(player:FlxPoint)
 	{
-		trace("following player");
+		// trace("following player");
 		checkPlayerDistance();
 		if (state == FOLLOW && playerDistance > 50)
 		{
@@ -132,6 +135,10 @@ class Buddy extends FlxSprite
 			bullets.recycle(Bullet.new).buddyShoot(shootAngle, this.getMidpoint());
 			return shootAngle;
 		}
+		else if (state == EVIL)
+		{
+			return null;
+		}
 		else
 		{
 			return null;
@@ -144,6 +151,17 @@ class Buddy extends FlxSprite
 		{
 			angle = pos1.angleBetween(pos2);
 		}
+	}
+
+	public function lookAtAngle(_ang:Float)
+	{
+		angle = _ang;
+	}
+
+	public function badShoot(_ang:Float)
+	{
+		// recycle a new BadBullet from the group, call buddyShoot on it and give it the angle and my midPoint
+		badBullets.recycle(BadBullet.new).buddyShoot(_ang, getMidpoint());
 	}
 
 }

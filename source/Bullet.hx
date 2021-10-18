@@ -11,8 +11,9 @@ class Bullet extends FlxSprite
 	public function new()
 	{
 		super();
-		makeGraphic(6, 6, FlxColor.WHITE);
-		trace("bullet created");
+		loadGraphic("assets/images/bullet.png");
+		// makeGraphic(6, 6, FlxColor.WHITE);
+		// trace("bullet created");
 	}
 
 	/**
