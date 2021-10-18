@@ -175,8 +175,8 @@ class PlayState extends FlxState
 		FlxG.collide(tilemap, overlords);
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
-			trace("player's just been hit by a badBullet");
-			if (bul.alive)
+			// trace("player's just been hit by a badBullet");
+			if (bul.shooting)
 			{
 				bul.kill();
 				pla.health--;
@@ -185,27 +185,25 @@ class PlayState extends FlxState
 		});
 		FlxG.overlap(buddies, bulletsg, (bud, bul) ->
 		{
-			if (bud.state == State.EVIL && bul.alive)
+			if (bud.state == State.EVIL && bul.shooting)
 			{
-				trace("evil buddy just shot by friendly bullet");
-				// bul.kill();
-				bul.destroy();
+				// trace("evil buddy just shot by friendly bullet");
+				bul.kill();
 				bud.kill();
 			}
 		});
 
 		FlxG.overlap(bulletsg, overlords, (bul, ol) ->
 		{
-			if (bul.alive)
+			if (bul.shooting)
 			{
-				trace("overlord just shot by friendly bullet");
+				// trace("overlord just shot by friendly bullet");
 				ol.shot();
 				bul.kill();
 			}
 		});
 	}
 
-	var playerMidpoint:FlxPoint;
 	/**
 		Listens for left mouse click, and shoots a bullet towards the mouse pointer from the player's midpoint
 	**/
@@ -213,8 +211,6 @@ class PlayState extends FlxState
 	{
 		if (mouse.justPressed)
 		{
-			playerMidpoint = player.getMidpoint();
-
 			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
 			buddies.forEach((buddy:Buddy) ->
 			{

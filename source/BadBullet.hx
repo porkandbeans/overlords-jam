@@ -1,6 +1,7 @@
 import flixel.math.FlxPoint;
 import flixel.math.FlxVelocity;
 import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
 
 class BadBullet extends Bullet
 {
@@ -12,8 +13,14 @@ class BadBullet extends Bullet
 	}
 	override public function shoot(x, y, point:FlxPoint)
 	{
+		shooting = false;
 		this.x = x;
 		this.y = y;
 		FlxVelocity.moveTowardsPoint(this, point);
+		new FlxTimer().start(0.01, (timer) ->
+		{
+			shooting = true;
+			timer.destroy();
+		});
 	}
 }

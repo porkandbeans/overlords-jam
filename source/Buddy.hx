@@ -46,12 +46,9 @@ class Buddy extends FlxSprite
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
-		if (state == EVIL && master.alive == false)
+		if (master == null && state == EVIL)
 		{
 			state = IDLE;
-			loadGraphic("assets/images/buddy.png");
-			velocity.x = 0;
-			velocity.y = 0;
 		}
 
 		if (state == EVIL)
@@ -143,7 +140,8 @@ class Buddy extends FlxSprite
 		{
 			shootAngle = player.angleBetween(mouse);
 			myMidpoint = getMidpoint();
-			var bullet = new Bullet();
+			var bullet = bullets.recycle(Bullet.new);
+			bullet.reset(myMidpoint.x, myMidpoint.y);
 			bullet.buddyShoot(shootAngle);
 			return shootAngle;
 		}
@@ -173,7 +171,10 @@ class Buddy extends FlxSprite
 	public function badShoot(_ang:Float)
 	{
 		myMidpoint = getMidpoint();
-		var bullet = new BadBullet(myMidpoint.x, myMidpoint.y);
+		// recycle a new BadBullet from the group, call buddyShoot on it and give it the angle and my midPoint
+		var bullet = badBullets.recycle(BadBullet.new);
+		bullet.reset(myMidpoint.x, myMidpoint.y);
 		bullet.buddyShoot(_ang);
 	}
+
 }
