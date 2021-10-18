@@ -70,6 +70,7 @@ class Overlord extends FlxSprite
 
 	var playerDistance:Float;
 	var buddyAngle:Float;
+	var myMidpoint:FlxPoint;
 
 	/**
 		get the distance between here and the player, if the player is within range, shoot stuff at them.
@@ -77,7 +78,8 @@ class Overlord extends FlxSprite
 	**/
 	function lookForPlayer()
 	{
-		playerDistance = getMidpoint().distanceTo(player.getMidpoint());
+		myMidpoint = getMidpoint();
+		playerDistance = myMidpoint.distanceTo(player.getMidpoint());
 
 		if (playerDistance < 500)
 		{
@@ -86,17 +88,21 @@ class Overlord extends FlxSprite
 			buddies.forEach((bud) ->
 			{
 				// set the buddy's angle to the angle between this overlord and the player
-				buddyAngle = getMidpoint().angleBetween(player.getMidpoint());
+				buddyAngle = myMidpoint.angleBetween(player.getMidpoint());
 				bud.lookAtAngle(buddyAngle);
 			});
 
 			//  shoot bullets at the player
 			if (canShoot)
 			{
-				bullets.recycle(BadBullet.new).shoot(getMidpoint().x, getMidpoint().y, player.getMidpoint());
+				var bullet = new BadBullet(myMidpoint.x, myMidpoint.y);
+				bullet.shoot(player.getMidpoint());
 				buddies.forEach((bud) ->
 				{
-					bud.badShoot(buddyAngle);
+					if (bud.alive)
+					{
+						bud.badShoot(buddyAngle);
+					}
 				});
 				canShoot = false;
 				shootTimer.start(1, (timer) ->

@@ -18,8 +18,6 @@ class Bullet extends FlxSprite
 
 	/**
 		shoot a bullet.
-		@param	x	the x co-ord
-		@param	t	the y co-ord
 		@param	point	can be null for Bullets, must be declared for BadBullet
 	**/
 	public function shoot(x, y, point:FlxPoint)
