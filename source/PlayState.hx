@@ -9,6 +9,7 @@ import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup;
 import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxPoint;
+import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxTimer;
 import lime.math.Vector2;
@@ -33,10 +34,18 @@ class PlayState extends FlxState
 	var hearts:FlxTypedGroup<Heart>;
 	var buddySpawns:FlxTypedGroup<BuddySpawn>;
 	var overlordSpawns:FlxTypedGroup<OverlordSpawn>;
+	var shootSound:FlxSound;
+	var painSound:FlxSound;
 
 	override public function create()
 	{
 		super.create();
+		shootSound = FlxG.sound.load("assets/sounds/blast.wav", 0.5, true);
+		painSound = FlxG.sound.load("assets/sounds/bone.wav", 0.8, false);
+		if (FlxG.sound.music == null)
+		{
+			FlxG.sound.playMusic("assets/music/Tatari.mp3", 0.2);
+		}
 		player = new Player(FlxG.width / 2, FlxG.height / 2);
 		playerVector = new Vector2(); // defined in update()
 
@@ -232,7 +241,8 @@ class PlayState extends FlxState
 		{
 			bul.kill();
 		});
-		FlxG.collide(buddies, buddies, (bud1:Buddy, bud2:Buddy) ->
+		FlxG.collide(buddies, buddies);
+		FlxG.overlap(buddies, buddies, (bud1:Buddy, bud2:Buddy) ->
 		{
 			bud1.unstuck();
 			bud2.unstuck();
@@ -240,7 +250,7 @@ class PlayState extends FlxState
 		FlxG.collide(tilemap, overlords);
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
-			// trace("player's just been hit by a badBullet");
+			painSound.play(true);
 			if (bul.shooting)
 			{
 				bul.kill();
@@ -322,6 +332,14 @@ class PlayState extends FlxState
 			{
 				buddy.shoot(player.getMidpoint(), mouse.getPosition());
 			});
+		}
+		if (mouse.pressed)
+		{
+			shootSound.play();
+		}
+		else
+		{
+			shootSound.stop();
 		}
 	}
 }

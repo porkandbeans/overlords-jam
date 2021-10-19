@@ -19,6 +19,9 @@ class Hud extends FlxTypedGroup<FlxSprite>
 	var scoreDesc:FlxText;
 	var replayButt:FlxButton;
 
+	var musicText:FlxText;
+	var musicButton:FlxButton;
+
 	public function new()
 	{
 		super();
@@ -38,6 +41,10 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		scoreDesc = new FlxText(gameOverText.x, gameOverText.y + 30, FlxG.width, "Your score is: ", 10);
 		add(scoreDesc);
 		scoreDesc.visible = false;
+
+		musicText = new FlxText(scoreDesc.x, FlxG.height - 20, FlxG.width, "Music: Tatari, by WaxTerK");
+		add(musicText);
+		musicText.visible = false;
 
 		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "Play again", () ->
 		{
@@ -94,5 +101,6 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		scoreText.y = scoreDesc.y;
 
 		replayButt.visible = true;
+		musicText.visible = true;
 	}
 }
