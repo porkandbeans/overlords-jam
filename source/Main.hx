@@ -9,6 +9,6 @@ class Main extends Sprite
 	{
 		super();
 		// camera zoom is defined here
-		addChild(new FlxGame(400, 400, PlayState));
+		addChild(new FlxGame(400, 400, MenuState));
 	}
 }

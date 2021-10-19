@@ -1,3 +1,4 @@
+import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVelocity;
@@ -30,7 +31,8 @@ class Bullet extends FlxSprite
 		this.x = x;
 		this.y = y;
 		alive = true;
-		FlxVelocity.moveTowardsMouse(this, SPEED);
+		FlxVelocity.moveTowardsPoint(this, new FlxPoint(FlxG.mouse.getPosition().x + 10, FlxG.mouse.getPosition().y + 10), SPEED);
+		//		FlxVelocity.moveTowardsMouse(this, SPEED);
 		new FlxTimer().start(0.1, (timer) ->
 		{
 			shooting = true;

@@ -4,6 +4,7 @@ import Buddy.State;
 import flixel.FlxG;
 import flixel.FlxG;
 import flixel.FlxObject;
+import flixel.FlxSprite;
 import flixel.FlxState;
 import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup;
@@ -11,6 +12,7 @@ import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxPoint;
 import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.math.Vector2;
 
@@ -36,20 +38,24 @@ class PlayState extends FlxState
 	var overlordSpawns:FlxTypedGroup<OverlordSpawn>;
 	var shootSound:FlxSound;
 	var painSound:FlxSound;
+	var mouseSprite:FlxSprite;
+	var hitsound:FlxSound;
 
 	override public function create()
 	{
 		super.create();
+
 		shootSound = FlxG.sound.load("assets/sounds/blast.wav", 0.5, true);
 		painSound = FlxG.sound.load("assets/sounds/bone.wav", 0.8, false);
-		if (FlxG.sound.music == null)
-		{
-			FlxG.sound.playMusic("assets/music/Tatari.mp3", 0.2);
-		}
+		hitsound = FlxG.sound.load("assets/sounds/hitsound.wav", 0.5, false);
+
 		player = new Player(FlxG.width / 2, FlxG.height / 2);
 		playerVector = new Vector2(); // defined in update()
 
 		mouse = FlxG.mouse;
+		mouseSprite = new FlxSprite(0, 0, "assets/images/reticule.png");
+		mouse.load(mouseSprite.pixels);
+
 		mousePos = new FlxPoint();
 		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/arena.json");
 		FlxG.collide(player, tilemap);
@@ -165,6 +171,7 @@ class PlayState extends FlxState
 		mousePos = mouse.getPosition();
 		player.getAngleAndRotate(mousePos);
 
+
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 		shootListen();
@@ -276,6 +283,7 @@ class PlayState extends FlxState
 		{
 			if (bul.shooting)
 			{
+				hitsound.play(true);
 				var pos = new Vector2(ol.x, ol.y);
 				// trace("overlord just shot by friendly bullet");
 				ol.shot();
@@ -322,6 +330,7 @@ class PlayState extends FlxState
 	{
 		if (mouse.pressed && canShoot)
 		{
+			mousePos = mouse.getPosition();
 			canShoot = false;
 			new FlxTimer().start(0.1, (timer) ->
 			{
@@ -330,7 +339,8 @@ class PlayState extends FlxState
 			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
 			buddies.forEach((buddy:Buddy) ->
 			{
-				buddy.shoot(player.getMidpoint(), mouse.getPosition());
+				// buddy.shoot(player.getMidpoint(), mouse.getPosition());
+				buddy.shoot(player.getMidpoint(), mousePos);
 			});
 		}
 		if (mouse.pressed)
