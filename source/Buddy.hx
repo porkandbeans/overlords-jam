@@ -25,6 +25,7 @@ class Buddy extends FlxSprite
 	var master:Overlord;
 	var myMidpoint:FlxPoint;
 	var mouse = FlxG.mouse;
+	var speed = 120;
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
@@ -155,9 +156,9 @@ class Buddy extends FlxSprite
 	{
 		// trace("following player");
 		checkPlayerDistance();
-		if (state == FOLLOW && playerDistance > 50)
+		if (state == FOLLOW && playerDistance > 100)
 		{
-			FlxVelocity.moveTowardsPoint(this, player, 120);
+			FlxVelocity.moveTowardsPoint(this, player, speed);
 		}
 		else if (state == FOLLOW)
 		{
@@ -243,4 +244,9 @@ class Buddy extends FlxSprite
 		bullet.buddyShoot(_ang);
 	}
 
+	public function unstuck()
+	{
+		velocity.x += Random.float(-0.5, 0.5);
+		velocity.y += Random.float(-0.5, 0.5);
+	}
 }

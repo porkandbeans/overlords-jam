@@ -10,6 +10,7 @@ import flixel.group.FlxGroup;
 import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxPoint;
 import flixel.tile.FlxTilemap;
+import flixel.util.FlxTimer;
 import lime.math.Vector2;
 
 class PlayState extends FlxState
@@ -154,7 +155,7 @@ class PlayState extends FlxState
 	{
 		mousePos = mouse.getPosition();
 		player.getAngleAndRotate(mousePos);
-		collidesAndOverlaps();
+
 		FlxG.camera.follow(player, TOPDOWN, 1);
 		super.update(elapsed);
 		shootListen();
@@ -169,6 +170,7 @@ class PlayState extends FlxState
 				buddyMult++;
 			}
 		});
+		collidesAndOverlaps();
 		// set multiplier equal to the number of following buddies
 		hud.setMult(buddyMult);
 
@@ -230,7 +232,11 @@ class PlayState extends FlxState
 		{
 			bul.kill();
 		});
-		FlxG.collide(buddies, buddies);
+		FlxG.collide(buddies, buddies, (bud1:Buddy, bud2:Buddy) ->
+		{
+			bud1.unstuck();
+			bud2.unstuck();
+		});
 		FlxG.collide(tilemap, overlords);
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
@@ -298,14 +304,19 @@ class PlayState extends FlxState
 			}
 		});
 	}
-
+	var canShoot:Bool = true;
 	/**
 		Listens for left mouse click, and shoots a bullet towards the mouse pointer from the player's midpoint
 	**/
 	function shootListen()
 	{
-		if (mouse.justPressed)
+		if (mouse.pressed && canShoot)
 		{
+			canShoot = false;
+			new FlxTimer().start(0.1, (timer) ->
+			{
+				canShoot = true;
+			});
 			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
 			buddies.forEach((buddy:Buddy) ->
 			{

@@ -79,7 +79,7 @@ class Overlord extends FlxSprite
 	{
 		playerDistance = getMidpoint().distanceTo(player.getMidpoint());
 
-		if (playerDistance < 200)
+		if (player.alive && playerDistance < 200)
 		{
 			// rotate to face the player
 			getAngleAndRotate(player.getMidpoint());
