@@ -245,15 +245,18 @@ class PlayState extends FlxState
 			if (player.health <= 0)
 			{
 				gameIsOver = true;
+				trace("Game over");
+				hud.gameOver(); // GoKritz is dumb
 				player.kill();
 				buddies.forEach((bud) ->
 				{
 					if (bud.state == FOLLOW)
 					{
 						bud.kill();
+
 					}
 
-					hud.gameOver();
+					// no stupid, it does not go here
 				});
 			}
 		}

@@ -99,6 +99,8 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		multText.text = "x" + Std.string(multiplier);
 	}
 
+	var sentAPIcall:Bool = false;
+
 	public function gameOver()
 	{
 		gameOverText.visible = true;
@@ -112,13 +114,17 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		replayButt.visible = true;
 		menuButton.visible = true;
 		musicText.visible = true;
-		if (NG.core != null && NG.core.loggedIn)
+		if (!sentAPIcall)
 		{
-			NG.core.requestScoreBoards(() ->
+			sentAPIcall = true;
+			if (NG.core != null && NG.core.loggedIn)
 			{
-				var scoreBoard = NG.core.scoreBoards.get(10934);
-				scoreBoard.postScore(score);
-			});
+				NG.core.requestScoreBoards(() ->
+				{
+					var scoreBoard = NG.core.scoreBoards.get(10934);
+					scoreBoard.postScore(score);
+				});
+			}
 		}
 	}
 }
