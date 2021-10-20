@@ -118,10 +118,6 @@ class Hud extends FlxTypedGroup<FlxSprite>
 			{
 				var scoreBoard = NG.core.scoreBoards.get(10934);
 				scoreBoard.postScore(score);
-				for (i in 0...scoreBoard.scores.length)
-				{
-					trace(scoreBoard.scores[i]);
-				}
 			});
 		}
 	}

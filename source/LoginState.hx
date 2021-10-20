@@ -12,6 +12,24 @@ class LoginState extends FlxState
 		var loggingInText = new FlxText(30, 30, FlxG.width - 60, "Logging in to Newgrounds...\n(If you can read this, try allowing pop-ups)");
 		add(loggingInText);
 
+		var api_key:String = haxe.Resource.getString("api_key");
+		var enc_key:String = haxe.Resource.getString("enc_key");
+		NG.createAndCheckSession(api_key);
+		NG.core.initEncryption(enc_key, RC4, BASE_64);
+
+		if (NG.core != null)
+		{
+			if (NG.core.attemptingLogin)
+			{
+				NG.core.onLogin.add(onLoggedIn);
+			}
+			else
+			{
+				NG.core.requestLogin(onLoggedIn);
+			}
+		}
+
+		/*
 		if (NG.core != null && !NG.core.loggedIn)
 		{
 			NG.core.requestLogin(onLoggedIn);
@@ -19,7 +37,7 @@ class LoginState extends FlxState
 		else if (NG.core != null && NG.core.loggedIn)
 		{
 			loadGame();
-		}
+		}*/
 	}
 
 	function onLoggedIn()
