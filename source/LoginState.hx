@@ -3,12 +3,14 @@ package;
 import flixel.FlxG;
 import flixel.FlxState;
 import flixel.text.FlxText;
+import flixel.ui.FlxButton;
 import io.newgrounds.NG;
 
 class LoginState extends FlxState
 {
 	override public function create()
 	{
+
 		var loggingInText = new FlxText(30, 30, FlxG.width - 60, "Logging in to Newgrounds...\n(If you can read this, try allowing pop-ups)");
 		add(loggingInText);
 
@@ -16,6 +18,9 @@ class LoginState extends FlxState
 		var enc_key:String = haxe.Resource.getString("enc_key");
 		NG.createAndCheckSession(api_key);
 		NG.core.initEncryption(enc_key, RC4, BASE_64);
+		var failButton = new FlxButton(30, 90, "Play anyway", loadGame);
+		add(failButton);
+		failButton.visible = false;
 
 		if (NG.core != null)
 		{
@@ -25,7 +30,11 @@ class LoginState extends FlxState
 			}
 			else
 			{
-				NG.core.requestLogin(onLoggedIn);
+				NG.core.requestLogin(onLoggedIn, null, () ->
+				{
+					loggingInText.text = "The login has failed for some reason.\nYou will not be able to post high-scores.";
+					failButton.visible = true;
+				});
 			}
 		}
 

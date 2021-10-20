@@ -1,6 +1,7 @@
 package;
 
 import Buddy.State;
+import flixel.FlxCamera.FlxCameraFollowStyle;
 import flixel.FlxG;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -10,6 +11,7 @@ import flixel.addons.editors.ogmo.FlxOgmo3Loader;
 import flixel.group.FlxGroup;
 import flixel.input.mouse.FlxMouse;
 import flixel.math.FlxPoint;
+import flixel.math.FlxVelocity;
 import flixel.system.FlxSound;
 import flixel.tile.FlxTilemap;
 import flixel.util.FlxColor;
@@ -58,6 +60,8 @@ class PlayState extends FlxState
 		mouse.load(mouseSprite.pixels);
 
 		mousePos = new FlxPoint();
+		camFollow = new FlxObject();
+		add(camFollow);
 		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/arena.json");
 		FlxG.collide(player, tilemap);
 		FlxG.collide(bullets, tilemap, (bul, til) ->
@@ -175,13 +179,25 @@ class PlayState extends FlxState
 		painSquares.add(new FlxObject(entity.x, entity.y, 16, 16));
 	}
 	var buddyMult:Int;
+	var camFollow:FlxObject;
 	override public function update(elapsed:Float)
 	{
 		mousePos = mouse.getPosition();
 		player.getAngleAndRotate(mousePos);
-
-
-		FlxG.camera.follow(player, TOPDOWN, 1);
+		camFollow.x = (mousePos.x + player.getMidpoint().x);
+		if (camFollow.x < 0)
+		{
+			camFollow.x = -camFollow.x;
+		}
+		camFollow.x = camFollow.x / 2;
+		camFollow.y = (mousePos.y + player.getMidpoint().y);
+		if (camFollow.y < 0)
+		{
+			camFollow.y = -camFollow.y;
+		}
+		camFollow.y = camFollow.y / 2;
+		// FlxG.camera.follow(player, TOPDOWN, 1);
+		FlxG.camera.follow(camFollow, NO_DEAD_ZONE, 1);
 		super.update(elapsed);
 		shootListen();
 		buddyMult = 0;
