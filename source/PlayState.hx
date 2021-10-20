@@ -197,7 +197,7 @@ class PlayState extends FlxState
 		}
 		camFollow.y = camFollow.y / 2;
 		// FlxG.camera.follow(player, TOPDOWN, 1);
-		FlxG.camera.follow(camFollow, NO_DEAD_ZONE, 1);
+		FlxG.camera.follow(camFollow, LOCKON, 6);
 		super.update(elapsed);
 		shootListen();
 		buddyMult = 0;
@@ -389,6 +389,11 @@ class PlayState extends FlxState
 		else
 		{
 			shootSound.stop();
+		}
+		// fullscreen button? why not
+		if (FlxG.keys.justPressed.F)
+		{
+			FlxG.fullscreen = !FlxG.fullscreen;
 		}
 	}
 }

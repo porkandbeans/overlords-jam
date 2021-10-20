@@ -154,4 +154,12 @@ class MenuState extends FlxState
 		FlxG.sound.music.volume -= 0.1;
 		volumeText.text = Std.string(Math.round(FlxG.sound.music.volume * 100)) + "%";
 	}
+	override public function update(elapsed:Float)
+	{
+		super.update(elapsed);
+		if (FlxG.keys.justPressed.F)
+		{
+			FlxG.fullscreen = !FlxG.fullscreen;
+		}
+	}
 }
