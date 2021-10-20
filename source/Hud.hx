@@ -6,6 +6,7 @@ import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
+import io.newgrounds.NG;
 
 class Hud extends FlxTypedGroup<FlxSprite>
 {
@@ -111,5 +112,17 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		replayButt.visible = true;
 		menuButton.visible = true;
 		musicText.visible = true;
+		if (NG.core != null && NG.core.loggedIn)
+		{
+			NG.core.requestScoreBoards(() ->
+			{
+				var scoreBoard = NG.core.scoreBoards.get(10934);
+				scoreBoard.postScore(score);
+				for (i in 0...scoreBoard.scores.length)
+				{
+					trace(scoreBoard.scores[i]);
+				}
+			});
+		}
 	}
 }

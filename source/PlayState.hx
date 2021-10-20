@@ -221,21 +221,27 @@ class PlayState extends FlxState
 		gameOverCheck();
 	}
 
+	var gameIsOver:Bool = false;
 	function gameOverCheck()
 	{
-		if (player.health <= 0)
+		if (!gameIsOver)
 		{
-			player.kill();
-			buddies.forEach((bud) ->
+			if (player.health <= 0)
 			{
-				if (bud.state == FOLLOW)
+				gameIsOver = true;
+				player.kill();
+				buddies.forEach((bud) ->
 				{
-					bud.kill();
-				}
+					if (bud.state == FOLLOW)
+					{
+						bud.kill();
+					}
 
-				hud.gameOver();
-			});
+					hud.gameOver();
+				});
+			}
 		}
+		
 	}
 
 	function collidesAndOverlaps()

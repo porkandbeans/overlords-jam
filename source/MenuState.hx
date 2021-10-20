@@ -7,6 +7,7 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
+import io.newgrounds.NG;
 
 class MenuState extends FlxState
 {
