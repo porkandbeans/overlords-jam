@@ -28,6 +28,9 @@ class MenuState extends FlxState
 	var backButton:FlxButton;
 
 	var musicButton:FlxButton;
+	var musicUpButt:FlxButton;
+	var musicDownButt:FlxButton;
+	var volumeText:FlxText;
 
 	override public function create()
 	{
@@ -54,6 +57,19 @@ class MenuState extends FlxState
 
 		musicButton = new FlxButton(FlxG.width - 120, FlxG.width - 60, "MUSIC: ON", toggleMusic);
 		add(musicButton);
+
+		musicUpButt = new FlxButton(musicButton.x + 60, musicButton.y + 30, "+", musicUp);
+		musicUpButt.width = 30;
+		musicDownButt = new FlxButton(musicButton.x, musicButton.y + 30, "-", musicDown);
+		musicDownButt.width = 30;
+		musicDownButt.loadGraphic("assets/images/button.png");
+		musicUpButt.width = 30;
+		musicUpButt.loadGraphic("assets/images/button.png");
+		add(musicUpButt);
+		add(musicDownButt);
+
+		volumeText = new FlxText(musicDownButt.x + 30, musicDownButt.y, 100, Std.string(FlxG.sound.music.volume * 100) + "%");
+		add(volumeText);
 
 		genText = new FlxText(30, 30, FlxG.width,
 			"You are an OVERLORD. Move around with WASD/Arrow keys.\nPoint and click to shoot.\n Hold SHIFT or SPACE to enter PRECISION MODE.");
@@ -125,5 +141,16 @@ class MenuState extends FlxState
 			FlxG.sound.music.play();
 			musicButton.text = "MUSIC: ON";
 		}
+	}
+	function musicUp()
+	{
+		FlxG.sound.music.volume += 0.1;
+		volumeText.text = Std.string(Math.round(FlxG.sound.music.volume * 100)) + "%";
+	}
+
+	function musicDown()
+	{
+		FlxG.sound.music.volume -= 0.1;
+		volumeText.text = Std.string(Math.round(FlxG.sound.music.volume * 100)) + "%";
 	}
 }

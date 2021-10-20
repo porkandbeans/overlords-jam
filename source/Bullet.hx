@@ -25,11 +25,11 @@ class Bullet extends FlxSprite
 		@param	t	the y co-ord
 		@param	point	can be null for Bullets, must be declared for BadBullet
 	**/
-	public function shoot(x, y, point:FlxPoint)
+	public function shoot(x:Float, y:Float, point:FlxPoint)
 	{
 		shooting = false;
-		this.x = x;
-		this.y = y;
+		this.x = x - 3;
+		this.y = y - 3;
 		alive = true;
 		FlxVelocity.moveTowardsPoint(this, new FlxPoint(FlxG.mouse.getPosition().x + 10, FlxG.mouse.getPosition().y + 10), SPEED);
 		//		FlxVelocity.moveTowardsMouse(this, SPEED);

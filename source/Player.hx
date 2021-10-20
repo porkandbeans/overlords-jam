@@ -17,6 +17,11 @@ class Player extends FlxSprite{
 		keyListeners();
 	}
 
+	public function takeDamage(p:Float)
+	{
+		health -= p;
+	}
+
 	// ====== I AM STEALING THIS FROM THE TUTORIAL https://haxeflixel.com/documentation/groundwork/ ======
 	var up:Bool = false;
 	var down:Bool = false;

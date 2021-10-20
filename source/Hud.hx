@@ -10,7 +10,7 @@ import flixel.util.FlxColor;
 class Hud extends FlxTypedGroup<FlxSprite>
 {
 	var healthBar:FlxBar;
-	var playerHealth:Int;
+	var playerHealth:Float;
 	var score:Int = 0;
 	var scoreText:FlxText;
 	var multiplier:Int;
@@ -21,6 +21,7 @@ class Hud extends FlxTypedGroup<FlxSprite>
 
 	var musicText:FlxText;
 	var musicButton:FlxButton;
+	var menuButton:FlxButton;
 
 	public function new()
 	{
@@ -46,12 +47,19 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		add(musicText);
 		musicText.visible = false;
 
-		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "Play again", () ->
+		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "RESTART", () ->
 		{
 			FlxG.switchState(new PlayState());
 		});
 		add(replayButt);
 		replayButt.visible = false;
+
+		menuButton = new FlxButton(replayButt.x + 80, replayButt.y, "MENU", () ->
+		{
+			FlxG.switchState(new MenuState());
+		});
+		add(menuButton);
+		menuButton.visible = false;
 
 
 		forEach((sprite) ->
@@ -101,6 +109,7 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		scoreText.y = scoreDesc.y;
 
 		replayButt.visible = true;
+		menuButton.visible = true;
 		musicText.visible = true;
 	}
 }

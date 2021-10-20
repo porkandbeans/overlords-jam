@@ -4,6 +4,7 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVelocity;
 import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
 import lime.math.Vector2;
 
 enum State
@@ -45,6 +46,7 @@ class Buddy extends FlxSprite
 		badBullets = new FlxTypedGroup<BadBullet>(10);
 		myMidpoint = new FlxPoint();
 		health = 3;
+		randMoveTimer = new FlxTimer();
 	}
 
 	override public function update(elapsed:Float)
@@ -67,8 +69,10 @@ class Buddy extends FlxSprite
 			checkOverlordDistance(master);
 			followOverlord();
 		}
-		else
+		else if (state == IDLE)
 		{
+			velocity.x = 0;
+			velocity.y = 0;
 			overlords.forEach((ol) ->
 			{
 				checkOverlordDistance(ol);
@@ -156,14 +160,13 @@ class Buddy extends FlxSprite
 	{
 		// trace("following player");
 		checkPlayerDistance();
-		if (state == FOLLOW && playerDistance > 100)
+		if (state == FOLLOW && playerDistance > 50)
 		{
 			FlxVelocity.moveTowardsPoint(this, player, speed);
 		}
 		else if (state == FOLLOW)
 		{
-			velocity.x = 0;
-			velocity.y = 0;
+			unstuck();
 		}
 	}
 
@@ -175,8 +178,7 @@ class Buddy extends FlxSprite
 		}
 		else if (state == EVIL)
 		{
-			velocity.x = 0;
-			velocity.y = 0;
+			unstuck();
 		}
 	}
 
@@ -188,7 +190,7 @@ class Buddy extends FlxSprite
 	**/
 	public function shoot(_player:FlxPoint, mouse:FlxPoint)
 	{
-		if (state == FOLLOW && alive)
+		if (state == FOLLOW && alive && player.alive)
 		{
 			var bullet = bullets.recycle(Bullet.new);
 			if (!player.slow)
@@ -244,9 +246,19 @@ class Buddy extends FlxSprite
 		bullet.buddyShoot(_ang);
 	}
 
+	var randMoveTimer:FlxTimer;
+	var chooseDir:Bool = true;
 	public function unstuck()
 	{
-		velocity.x += Random.float(-0.5, 0.5);
-		velocity.y += Random.float(-0.5, 0.5);
+		if (chooseDir)
+		{
+			chooseDir = false;
+			randMoveTimer.start(0.3, (timer) ->
+			{
+				chooseDir = true;
+				velocity.x = Random.float(-1, 1) * speed;
+				velocity.y = Random.float(-1, 1) * speed;
+			});
+		}
 	}
 }

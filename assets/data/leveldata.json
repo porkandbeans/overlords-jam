@@ -77,6 +77,17 @@
         {"name": "buddy", "id": 56, "_eid": "44521111", "x": 1088, "y": 944, "originX": 0, "originY": 0},
         {"name": "buddy", "id": 57, "_eid": "44521111", "x": 1104, "y": 576, "originX": 0, "originY": 0}
       ]
+    },
+    {
+      "name": "pain",
+      "_eid": "68479101",
+      "offsetX": 0,
+      "offsetY": 0,
+      "gridCellWidth": 16,
+      "gridCellHeight": 16,
+      "gridCellsX": 125,
+      "gridCellsY": 125,
+      "entities": []
     }
   ]
 }

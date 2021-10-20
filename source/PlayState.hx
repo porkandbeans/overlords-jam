@@ -40,6 +40,7 @@ class PlayState extends FlxState
 	var painSound:FlxSound;
 	var mouseSprite:FlxSprite;
 	var hitsound:FlxSound;
+	var painSquares:FlxTypedGroup<FlxObject>;
 
 	override public function create()
 	{
@@ -86,6 +87,7 @@ class PlayState extends FlxState
 		tilemap.setTileProperties(2, FlxObject.ANY); // wall
 		tilemap.setTileProperties(3, FlxObject.NONE); // floor
 		tilemap.setTileProperties(4, FlxObject.NONE); // floor
+		tilemap.setTileProperties(5, FlxObject.NONE); // danger tile
 		// tilemap.setTileProperties(5, FlxObject.NONE); // floor with red stain
 
 		// helper group for bullets and recycling them
@@ -99,6 +101,7 @@ class PlayState extends FlxState
 		hearts = new FlxTypedGroup<Heart>();
 		buddySpawns = new FlxTypedGroup<BuddySpawn>();
 		overlordSpawns = new FlxTypedGroup<OverlordSpawn>();
+		painSquares = new FlxTypedGroup<FlxObject>();
 
 		overlords = new FlxTypedGroup<Overlord>();
 
@@ -106,6 +109,7 @@ class PlayState extends FlxState
 		// add(hud); add after everything else
 
 		map.loadEntities(placeEntities, "ents");
+		map.loadEntities(placePainzone, "pain");
 		
 		add(bullets);
 		add(player); // player goes on top of the tilemap, so add after
@@ -122,6 +126,7 @@ class PlayState extends FlxState
 		add(hearts);
 		add(buddySpawns);
 		add(overlordSpawns);
+		add(painSquares);
 		add(hud);
 	}
 
@@ -164,6 +169,10 @@ class PlayState extends FlxState
 				overlordSpawns.add(new OverlordSpawn(entity.x, entity.y, player));
 				return;
 		}
+	}
+	function placePainzone(entity:EntityData)
+	{
+		painSquares.add(new FlxObject(entity.x, entity.y, 16, 16));
 	}
 	var buddyMult:Int;
 	override public function update(elapsed:Float)
@@ -249,11 +258,6 @@ class PlayState extends FlxState
 			bul.kill();
 		});
 		FlxG.collide(buddies, buddies);
-		FlxG.overlap(buddies, buddies, (bud1:Buddy, bud2:Buddy) ->
-		{
-			bud1.unstuck();
-			bud2.unstuck();
-		});
 		FlxG.collide(tilemap, overlords);
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
@@ -321,6 +325,12 @@ class PlayState extends FlxState
 				}
 			}
 		});
+		// hurt the player in enemy spawn zones
+		FlxG.overlap(player, painSquares, (pl, pa) ->
+		{
+			player.takeDamage(0.001);
+			hud.updateBar(player.health);
+		});
 	}
 	var canShoot:Bool = true;
 	/**
@@ -328,24 +338,31 @@ class PlayState extends FlxState
 	**/
 	function shootListen()
 	{
-		if (mouse.pressed && canShoot)
+		if (player.alive)
 		{
-			mousePos = mouse.getPosition();
-			canShoot = false;
-			new FlxTimer().start(0.1, (timer) ->
+			if (mouse.pressed && canShoot)
 			{
-				canShoot = true;
-			});
-			bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
-			buddies.forEach((buddy:Buddy) ->
+				mousePos = mouse.getPosition();
+				canShoot = false;
+				new FlxTimer().start(0.1, (timer) ->
+				{
+					canShoot = true;
+				});
+				bullets.recycle(Bullet.new).shoot(player.getMidpoint().x, player.getMidpoint().y, null);
+				buddies.forEach((buddy:Buddy) ->
+				{
+					// buddy.shoot(player.getMidpoint(), mouse.getPosition());
+					buddy.shoot(player.getMidpoint(), mousePos);
+				});
+			}
+			if (mouse.pressed)
 			{
-				// buddy.shoot(player.getMidpoint(), mouse.getPosition());
-				buddy.shoot(player.getMidpoint(), mousePos);
-			});
-		}
-		if (mouse.pressed)
-		{
-			shootSound.play();
+				shootSound.play();
+			}
+			else
+			{
+				shootSound.stop();
+			}
 		}
 		else
 		{
