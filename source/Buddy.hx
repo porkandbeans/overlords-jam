@@ -288,7 +288,10 @@ class Buddy extends FlxSprite
 	}
 	override public function kill()
 	{
-		dieSounds[Random.int(0, dieSounds.length - 1)].play();
+		if (player.alive)
+		{
+			dieSounds[Random.int(0, dieSounds.length - 1)].play();
+		}
 		super.kill();
 	}
 }
