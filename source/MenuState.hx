@@ -100,11 +100,13 @@ class MenuState extends FlxState
 		{
 			if (NG.core != null && NG.core.loggedIn)
 			{
-				NG.core.requestScoreBoards(() ->
+				/*NG.core.requestScoreBoards(() ->
 				{
 					var scoreBoard = NG.core.scoreBoards.get(10934);
 					scoreBoard.postScore(0);
-				});
+				});*/
+				NG.core.calls.gateway.ping().send();
+				trace(NG.core.calls.gateway.ping());
 			}
 		});
 

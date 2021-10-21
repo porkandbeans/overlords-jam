@@ -3,6 +3,7 @@ import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxPoint;
 import flixel.math.FlxVelocity;
+import flixel.system.FlxSound;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import lime.math.Vector2;
@@ -27,11 +28,15 @@ class Buddy extends FlxSprite
 	var myMidpoint:FlxPoint;
 	var mouse = FlxG.mouse;
 	var speed = 120;
+	var followSounds:Array<FlxSound>;
+	var dieSounds:Array<FlxSound>;
+	var buddyVolume:Float = 1;
 
 	public var fired:Bool = false;
 	public var bullets:FlxTypedGroup<Bullet>;
 	public var badBullets:FlxTypedGroup<BadBullet>;
 	public var following:Bool;
+
 
 	public function new(x, y, _player:Player, _overlords:FlxTypedGroup<Overlord>)
 	{
@@ -47,6 +52,24 @@ class Buddy extends FlxSprite
 		myMidpoint = new FlxPoint();
 		health = 3;
 		randMoveTimer = new FlxTimer();
+		followSounds = new Array<FlxSound>();
+		followSounds = [
+			FlxG.sound.load("assets/sounds/buddy1.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddy2.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddy3.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddy4.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddy5.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddy6.wav", buddyVolume, false)
+		];
+
+		dieSounds = new Array<FlxSound>();
+		dieSounds = [
+			FlxG.sound.load("assets/sounds/buddydie1.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie2.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddydie3.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie4.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddydie5.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie6.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddydie7.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie8.wav", buddyVolume, false),
+			FlxG.sound.load("assets/sounds/buddydie9.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie10.wav", buddyVolume, false)
+		];
 	}
 
 	override public function update(elapsed:Float)
@@ -137,6 +160,8 @@ class Buddy extends FlxSprite
 		{
 			state = FOLLOW;
 			loadGraphic("assets/images/buddy_follow.png");
+			// randomly choose one of the sounds in the array to play
+			followSounds[Random.int(0, followSounds.length - 1)].play();
 		}
 	}
 
@@ -260,5 +285,10 @@ class Buddy extends FlxSprite
 				velocity.y = Random.float(-1, 1) * speed;
 			});
 		}
+	}
+	override public function kill()
+	{
+		dieSounds[Random.int(0, dieSounds.length - 1)].play();
+		super.kill();
 	}
 }

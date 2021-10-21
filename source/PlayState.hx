@@ -63,25 +63,7 @@ class PlayState extends FlxState
 		camFollow = new FlxObject();
 		add(camFollow);
 		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/arena.json");
-		FlxG.collide(player, tilemap);
-		FlxG.collide(bullets, tilemap, (bul, til) ->
-		{
-			bul.kill();
-		});
-		FlxG.collide(buddyBullets, tilemap, (bul, til) ->
-		{
-			bul.kill();
-		});
-		FlxG.collide(tilemap, badBullets, (til, bul) ->
-		{
-			bul.kill();
-		});
-		FlxG.collide(tilemap, buddyBadBullets, (til, bul) ->
-		{
-			bul.kill();
-		});
-		FlxG.collide(buddies, buddies);
-		FlxG.collide(tilemap, overlords);
+
 		tilemap = map.loadTilemap("assets/images/tilemap/tiles.png", "new_layer");
 		tilemap.follow();
 		add(tilemap);
@@ -180,7 +162,28 @@ class PlayState extends FlxState
 	}
 	var buddyMult:Int;
 	var camFollow:FlxObject;
+
 	override public function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		cameraLogic();
+
+		shootListen();
+
+		collidesAndOverlaps();
+
+		setMultiplier();
+
+		spawnChecks();
+
+		gameOverCheck();
+	}
+
+	/**
+		does a cool neat fancy Hotline-Miami style thing
+	**/
+	function cameraLogic()
 	{
 		mousePos = mouse.getPosition();
 		player.getAngleAndRotate(mousePos);
@@ -198,23 +201,13 @@ class PlayState extends FlxState
 		camFollow.y = camFollow.y / 2;
 		// FlxG.camera.follow(player, TOPDOWN, 1);
 		FlxG.camera.follow(camFollow, LOCKON, 6);
-		super.update(elapsed);
-		shootListen();
-		buddyMult = 0;
-		buddies.forEach((buddy:Buddy) ->
-		{
-			buddy.checkPlayerDistance();
-			buddy.followPlayer(player.getMidpoint());
-			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
-			if (buddy.alive && buddy.state == FOLLOW)
-			{
-				buddyMult++;
-			}
-		});
-		collidesAndOverlaps();
-		// set multiplier equal to the number of following buddies
-		hud.setMult(buddyMult);
+	}
 
+	/**
+		adds new mobs to their respective groups when they spawn
+	**/
+	function spawnChecks()
+	{
 		buddySpawns.forEach((spawner) ->
 		{
 			if (spawner.getBuddy() != null)
@@ -233,11 +226,12 @@ class PlayState extends FlxState
 				olSpawn.done();
 			}
 		});
-
-		gameOverCheck();
 	}
 
 	var gameIsOver:Bool = false;
+	/**
+		DDOSes the Newgrounds API. Oh, it also looks at your health and calls hud.gameOver();
+	**/
 	function gameOverCheck()
 	{
 		if (!gameIsOver)
@@ -253,16 +247,37 @@ class PlayState extends FlxState
 					if (bud.state == FOLLOW)
 					{
 						bud.kill();
-
 					}
-
 					// no stupid, it does not go here
 				});
 			}
 		}
-		
 	}
 
+	/**
+		sets your point multiplier based on how many buddies are following the player.
+	**/
+	function setMultiplier()
+	{
+		buddyMult = 0;
+		buddies.forEach((buddy:Buddy) ->
+		{
+			buddy.checkPlayerDistance();
+			buddy.followPlayer(player.getMidpoint());
+			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
+			if (buddy.alive && buddy.state == FOLLOW)
+			{
+				buddyMult++;
+			}
+		});
+
+		// set multiplier equal to the number of following buddies
+		hud.setMult(buddyMult);
+	}
+
+	/**
+		listens for overlaps and collisions. This is probably the worst part of this code.
+	**/
 	function collidesAndOverlaps()
 	{
 		FlxG.collide(player, tilemap);
@@ -284,9 +299,11 @@ class PlayState extends FlxState
 		});
 		FlxG.collide(buddies, buddies);
 		FlxG.collide(tilemap, overlords);
+		// === PLAYER HIT BY A BULLET ===
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
 			painSound.play(true);
+			hud.flashOverlay();
 			if (bul.shooting)
 			{
 				bul.kill();
@@ -358,6 +375,7 @@ class PlayState extends FlxState
 		});
 	}
 	var canShoot:Bool = true;
+
 	/**
 		Listens for left mouse click, and shoots a bullet towards the mouse pointer from the player's midpoint
 	**/
