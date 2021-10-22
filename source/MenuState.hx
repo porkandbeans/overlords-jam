@@ -95,29 +95,6 @@ class MenuState extends FlxState
 		olText.visible = false;
 		backButton.visible = false;
 		// NG.core.verbose = true;
-
-		var postScoreButton = new FlxButton(0, 0, "Post score 0", () ->
-		{
-			if (NG.core != null && NG.core.loggedIn)
-			{
-				/*NG.core.requestScoreBoards(() ->
-				{
-					var scoreBoard = NG.core.scoreBoards.get(10934);
-					scoreBoard.postScore(0);
-				});*/
-				NG.core.calls.gateway.ping().send();
-				trace(NG.core.calls.gateway.ping());
-			}
-		});
-
-		add(postScoreButton);
-
-		postScoreButton.visible = false;
-
-		if (NG.core.user.name == "GoKritz")
-		{
-			postScoreButton.visible = true;
-		}
 	}
 
 	function help()

@@ -16,11 +16,10 @@ class LoginState extends FlxState
 
 		var api_key:String = haxe.Resource.getString("api_key");
 		var enc_key:String = haxe.Resource.getString("enc_key");
-		NG.createAndCheckSession(api_key);
+		NG.create(api_key);
 		NG.core.initEncryption(enc_key, RC4, BASE_64);
 		var failButton = new FlxButton(30, 90, "Play anyway", loadGame);
 		add(failButton);
-		failButton.visible = false;
 
 		if (NG.core != null)
 		{
@@ -32,7 +31,7 @@ class LoginState extends FlxState
 			{
 				NG.core.requestLogin(onLoggedIn, null, () ->
 				{
-					loggingInText.text = "The login has failed for some reason.\nYou will not be able to post high-scores.";
+					loggingInText.text = "The login has failed. Maybe you denied permission?\nYou will not be able to post high-scores.";
 					failButton.visible = true;
 				});
 			}
