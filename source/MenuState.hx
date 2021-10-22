@@ -7,6 +7,7 @@ import flixel.addons.display.FlxBackdrop;
 import flixel.group.FlxGroup;
 import flixel.text.FlxText;
 import flixel.ui.FlxButton;
+import io.newgrounds.NG;
 
 class MenuState extends FlxState
 {
@@ -93,6 +94,7 @@ class MenuState extends FlxState
 		olSprite.visible = false;
 		olText.visible = false;
 		backButton.visible = false;
+		// NG.core.verbose = true;
 	}
 
 	function help()
@@ -152,5 +154,13 @@ class MenuState extends FlxState
 	{
 		FlxG.sound.music.volume -= 0.1;
 		volumeText.text = Std.string(Math.round(FlxG.sound.music.volume * 100)) + "%";
+	}
+	override public function update(elapsed:Float)
+	{
+		super.update(elapsed);
+		if (FlxG.keys.justPressed.F)
+		{
+			FlxG.fullscreen = !FlxG.fullscreen;
+		}
 	}
 }

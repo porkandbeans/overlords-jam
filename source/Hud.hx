@@ -6,6 +6,8 @@ import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
 import flixel.ui.FlxButton;
 import flixel.util.FlxColor;
+import flixel.util.FlxTimer;
+import io.newgrounds.NG;
 
 class Hud extends FlxTypedGroup<FlxSprite>
 {
@@ -23,10 +25,13 @@ class Hud extends FlxTypedGroup<FlxSprite>
 	var musicButton:FlxButton;
 	var menuButton:FlxButton;
 
+	var painOverlay:FlxSprite;
+
 	public function new()
 	{
 		super();
 
+		// === THESE ARE ALWAYS VISIBLE ===
 		healthBar = new FlxBar(10, 15, LEFT_TO_RIGHT, 200, 20, null, "_health", 0, 20, true);
 		healthBar.createFilledBar(null, FlxColor.GREEN, true, FlxColor.BLACK);
 		healthBar.alpha = 0;
@@ -36,24 +41,22 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		multText = new FlxText(0, FlxG.height - 15, FlxG.width, "x" + Std.string(multiplier), 10);
 		add(multText);
 
+		// === VISIBLE ON GAME OVER ===
 		gameOverText = new FlxText(FlxG.width / 2 - 100, FlxG.height / 2 - 20, FlxG.width, "GAME OVER", 30);
 		add(gameOverText);
 		gameOverText.visible = false;
 		scoreDesc = new FlxText(gameOverText.x, gameOverText.y + 30, FlxG.width, "Your score is: ", 10);
 		add(scoreDesc);
 		scoreDesc.visible = false;
-
 		musicText = new FlxText(scoreDesc.x, FlxG.height - 20, FlxG.width, "Music: Tatari, by WaxTerK");
 		add(musicText);
 		musicText.visible = false;
-
 		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "RESTART", () ->
 		{
 			FlxG.switchState(new PlayState());
 		});
 		add(replayButt);
 		replayButt.visible = false;
-
 		menuButton = new FlxButton(replayButt.x + 80, replayButt.y, "MENU", () ->
 		{
 			FlxG.switchState(new MenuState());
@@ -61,12 +64,21 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		add(menuButton);
 		menuButton.visible = false;
 
+		// === DISPLAYS WHEN YOU GET SHOT ===
+		painOverlay = new FlxSprite(0, 0, "assets/images/painOverlay.png");
+		add(painOverlay);
+		painOverlay.alpha = 0;
 
 		forEach((sprite) ->
 		{
 			// makes all the sprites in this group follow the camera
 			sprite.scrollFactor.set(0, 0);
 		});
+		// message the server every 5 minutes and ask if everything's ok bb <3
+		var apiCheck = new FlxTimer().start(300, (timer) ->
+		{
+			NG.core.calls.gateway.ping().send();
+		}, 0);
 	}
 
 	public function updateBar(x:Float)
@@ -98,6 +110,8 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		multText.text = "x" + Std.string(multiplier);
 	}
 
+	var sentAPIcall:Bool = false;
+
 	public function gameOver()
 	{
 		gameOverText.visible = true;
@@ -111,5 +125,22 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		replayButt.visible = true;
 		menuButton.visible = true;
 		musicText.visible = true;
+		if (!sentAPIcall)
+		{
+			sentAPIcall = true;
+			if (NG.core != null && NG.core.loggedIn)
+			{
+				NG.core.requestScoreBoards(() ->
+				{
+					var scoreBoard = NG.core.scoreBoards.get(10934);
+					scoreBoard.postScore(score);
+				});
+			}
+		}
+	}
+	public function flashOverlay()
+	{
+		painOverlay.alpha = 1;
+		FlxTween.tween(painOverlay, {alpha: 0}, 0.5);
 	}
 }

@@ -40,6 +40,7 @@
 
 	<!--In case you want to use the addons package-->
 	<haxelib name="flixel-addons" />
+	<haxelib name="newgrounds" />
 
 	<!--In case you want to use the ui package-->
 	<!--<haxelib name="flixel-ui" />-->
@@ -81,5 +82,7 @@
 
 	<!-- _________________________________ Custom _______________________________ -->
 
-	<!--Place custom nodes like icons here (higher priority to override the HaxeFlixel icon)-->
+	<!-- API key for newgrounds that gets encrypted at compile time and I can add safely to .gitignore -->
+	<haxeflag name="--resource" value="appId@api_key" />
+	<haxeflag name="--resource" value="encKey@enc_key" />
 </project>
