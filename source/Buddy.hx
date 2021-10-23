@@ -43,7 +43,7 @@ class Buddy extends FlxSprite
 		super(x, y);
 		player = _player;
 		overlords = _overlords;
-		state = IDLE; // param to var
+		state = IDLE;
 		makeGraphic(16, 16, FlxColor.BLUE);
 		loadGraphic("assets/images/buddy.png");
 		myPos = new Vector2();
@@ -67,8 +67,7 @@ class Buddy extends FlxSprite
 			FlxG.sound.load("assets/sounds/buddydie1.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie2.wav", buddyVolume, false),
 			FlxG.sound.load("assets/sounds/buddydie3.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie4.wav", buddyVolume, false),
 			FlxG.sound.load("assets/sounds/buddydie5.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie6.wav", buddyVolume, false),
-			FlxG.sound.load("assets/sounds/buddydie7.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie8.wav", buddyVolume, false),
-			FlxG.sound.load("assets/sounds/buddydie9.wav", buddyVolume, false), FlxG.sound.load("assets/sounds/buddydie10.wav", buddyVolume, false)
+			FlxG.sound.load("assets/sounds/buddydie10.wav", buddyVolume, false)
 		];
 	}
 
@@ -76,10 +75,13 @@ class Buddy extends FlxSprite
 	{
 		super.update(elapsed);
 		myMidpoint = getMidpoint();
-		if (state == EVIL && master.alive == false)
+		setState();
+		stateBehaviour();
+		updateSprite();
+
+		/*if (state == EVIL && master.alive == false)
 		{
-			// oh no, my master is dead!
-			overlords.remove(master);
+																				// oh no, my master is dead!
 			master = null;
 			state = IDLE;
 			health = 3;
@@ -89,7 +91,7 @@ class Buddy extends FlxSprite
 		}
 		else if (state == EVIL)
 		{
-			checkOverlordDistance(master);
+					// checkOverlordDistance(master);
 			followOverlord();
 		}
 		else if (state == IDLE)
@@ -98,10 +100,57 @@ class Buddy extends FlxSprite
 			velocity.y = 0;
 			overlords.forEach((ol) ->
 			{
-				checkOverlordDistance(ol);
+						checkOverlordDistance();
 			});
+		}*/
+	}
+
+	public function updateOverlordsGroup(ols:FlxTypedGroup<Overlord>)
+	{
+		overlords = ols;
+	}
+
+	// check distance to each overlord
+	// become evil if close to ol
+	// check distance to player
+	// become follow if close
+
+	function setState()
+	{
+		if (state == IDLE)
+		{
+			health = 3;
+			velocity.x = 0;
+			velocity.y = 0;
+			checkOverlordDistance();
+			checkPlayerDistance();
 		}
-		updateSprite();
+	}
+
+	function stateBehaviour()
+	{
+		if (state == EVIL)
+		{
+			if (master == null || !master.alive)
+			{
+				state = IDLE;
+			}
+			else
+			{
+				followOverlord();
+			}
+		}
+		else if (state == FOLLOW)
+		{
+			if (player == null || !player.alive)
+			{
+				state = IDLE;
+			}
+			else
+			{
+				followPlayer();
+			}
+		}
 	}
 
 	function updateSprite()
@@ -142,6 +191,10 @@ class Buddy extends FlxSprite
 				return;
 			}
 		}
+		else if (state == IDLE)
+		{
+			loadGraphic("assets/images/buddy.png");
+		}
 	}
 
 	/**
@@ -156,38 +209,51 @@ class Buddy extends FlxSprite
 	public function checkPlayerDistance()
 	{
 		playerDistance = getMidpoint().distanceTo(player.getMidpoint());
+		// IDLE check to prevent sounds playing twice
 		if (state == IDLE && playerDistance < 100)
 		{
 			state = FOLLOW;
 			loadGraphic("assets/images/buddy_follow.png");
 			// randomly choose one of the sounds in the array to play
-			followSounds[Random.int(0, followSounds.length - 1)].play();
+			if (alive)
+			{
+				followSounds[Random.int(0, followSounds.length - 1)].play();
+			}
 		}
 	}
 
 	//	distance to master
 	var olDistance:Float;
 
-	public function checkOverlordDistance(overlord:Overlord)
+	public function checkOverlordDistance()
 	{
-		// get my own midpoint, then get the distance to the overlord's midpoint
-		olDistance = getMidpoint().distanceTo(overlord.getMidpoint());
-		if (olDistance < 100 && state == IDLE)
+		overlords.forEach((ol) ->
 		{
-			state = EVIL;
-			loadGraphic("assets/images/buddy_evil.png");
-			master = overlord;
-			master.addBuddy(this);
-		}
+			if (ol.alive)
+			{
+				olDistance = getMidpoint().distanceTo(ol.getMidpoint());
+				if (olDistance < 100 && state == IDLE)
+				{
+					state = EVIL;
+					loadGraphic("assets/images/buddy_evil.png");
+					master = ol;
+					master.addBuddy(this);
+				}
+			}
+			
+		});
+		// get my own midpoint, then get the distance to the overlord's midpoint
 	}
 
-	public function followPlayer(player:FlxPoint)
+	public function followPlayer()
 	{
 		// trace("following player");
-		checkPlayerDistance();
+		// checkPlayerDistance();
+		playerDistance = getMidpoint().distanceTo(player.getMidpoint());
+		
 		if (state == FOLLOW && playerDistance > 50)
 		{
-			FlxVelocity.moveTowardsPoint(this, player, speed);
+			FlxVelocity.moveTowardsPoint(this, player.getMidpoint(), speed);
 		}
 		else if (state == FOLLOW)
 		{
@@ -197,7 +263,7 @@ class Buddy extends FlxSprite
 
 	public function followOverlord()
 	{
-		if (state == EVIL && olDistance > 50)
+		if (state == EVIL && getMidpoint().distanceTo(master.getMidpoint()) > 50)
 		{
 			FlxVelocity.moveTowardsPoint(this, master.getMidpoint());
 		}
@@ -293,5 +359,13 @@ class Buddy extends FlxSprite
 			dieSounds[Random.int(0, dieSounds.length - 1)].play();
 		}
 		super.kill();
+	}
+	public function setIdle()
+	{
+		state = IDLE;
+		health = 3;
+		loadGraphic("assets/images/buddy.png");
+		velocity.x = 0;
+		velocity.y = 0;
 	}
 }

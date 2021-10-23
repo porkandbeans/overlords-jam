@@ -6,19 +6,19 @@ class BuddySpawn extends FlxObject
 {
 	var ready:Bool = true;
 	var pl:Player;
-	var ols:FlxTypedGroup<Overlord>;
 	var buddy:Buddy;
+	var plState:PlayState;
 
-	public function new(x, y, player:Player, overlords:FlxTypedGroup<Overlord>)
+	public function new(x, y, player:Player, plS:PlayState)
 	{
 		super(x, y);
 		pl = player;
-		ols = overlords;
+		plState = plS;
 	}
 
 	function spawnBuddy()
 	{
-		buddy = new Buddy(this.x, this.y, pl, ols);
+		buddy = new Buddy(this.x, this.y, pl, plState.overlords);
 	}
 
 	public function getBuddy()

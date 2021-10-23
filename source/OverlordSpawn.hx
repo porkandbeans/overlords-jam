@@ -2,6 +2,7 @@ import flixel.FlxObject;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.util.FlxTimer;
 
+
 class OverlordSpawn extends FlxObject
 {
 	var ready:Bool = true;
@@ -16,7 +17,8 @@ class OverlordSpawn extends FlxObject
 
 	function spawnOverlord()
 	{
-		overlord = new Overlord(x, y, pl);
+		// only null because Survival mode overlords don't need this reference
+		overlord = new Overlord(x, y, pl, SURVIVAL, null);
 		// stateGroup.add(overlord);
 	}
 

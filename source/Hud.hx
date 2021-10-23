@@ -13,7 +13,7 @@ class Hud extends FlxTypedGroup<FlxSprite>
 {
 	var healthBar:FlxBar;
 	var playerHealth:Float;
-	var score:Int = 0;
+	public var score:Int = 0;
 	var scoreText:FlxText;
 	var multiplier:Int;
 	var multText:FlxText;
@@ -27,19 +27,43 @@ class Hud extends FlxTypedGroup<FlxSprite>
 
 	var painOverlay:FlxSprite;
 
-	public function new()
+	var sacrificeMode:Bool;
+
+	var redTeamScoreText:FlxText;
+	var redTeamDesc:FlxText;
+
+	public var redTeamScore:Int;
+
+	/**
+		@param	mode	true = sacrifice mode, false = survival
+	**/
+	public function new(mode:Bool)
 	{
 		super();
+
+		sacrificeMode = mode;
 
 		// === THESE ARE ALWAYS VISIBLE ===
 		healthBar = new FlxBar(10, 15, LEFT_TO_RIGHT, 200, 20, null, "_health", 0, 20, true);
 		healthBar.createFilledBar(null, FlxColor.GREEN, true, FlxColor.BLACK);
 		healthBar.alpha = 0;
 		add(healthBar);
-		scoreText = new FlxText(0, FlxG.height - 30, FlxG.width, Std.string(score), 10);
+		scoreText = new FlxText(0, FlxG.height - 30, FlxG.width, Std.string(score), 20);
 		add(scoreText);
-		multText = new FlxText(0, FlxG.height - 15, FlxG.width, "x" + Std.string(multiplier), 10);
-		add(multText);
+		if (!sacrificeMode)
+		{
+			multText = new FlxText(0, FlxG.height - 15, FlxG.width, "x" + Std.string(multiplier), 10);
+			add(multText);
+			scoreText.size = 10;
+		}
+		else
+		{
+			scoreText.y = FlxG.height + 10;
+			redTeamScoreText = new FlxText(FlxG.width - 30, FlxG.height - 30, "0", 20);
+			redTeamScoreText.color = FlxColor.RED;
+			add(redTeamScoreText);
+		}
+		
 
 		// === VISIBLE ON GAME OVER ===
 		gameOverText = new FlxText(FlxG.width / 2 - 100, FlxG.height / 2 - 20, FlxG.width, "GAME OVER", 30);
@@ -51,9 +75,17 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		musicText = new FlxText(scoreDesc.x, FlxG.height - 20, FlxG.width, "Music: Tatari, by WaxTerK");
 		add(musicText);
 		musicText.visible = false;
-		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 20, "RESTART", () ->
+		replayButt = new FlxButton(scoreDesc.x, scoreDesc.y + 25, "RESTART", () ->
 		{
-			FlxG.switchState(new PlayState());
+			if (!sacrificeMode)
+			{
+				FlxG.switchState(new PlayState("assets/data/arena.json"));
+			}
+			else
+			{
+				FlxG.switchState(new PlayState("assets/data/sacrifice.json"));
+			}
+			
 		});
 		add(replayButt);
 		replayButt.visible = false;
@@ -63,6 +95,14 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		});
 		add(menuButton);
 		menuButton.visible = false;
+		if (sacrificeMode)
+		{
+			scoreDesc.text = "You: ";
+			scoreText.y -= 40;
+			redTeamDesc = new FlxText(scoreText.x + 25, scoreDesc.y, FlxG.width, "Them: ", 10);
+			add(redTeamDesc);
+			redTeamDesc.visible = false;
+		}
 
 		// === DISPLAYS WHEN YOU GET SHOT ===
 		painOverlay = new FlxSprite(0, 0, "assets/images/painOverlay.png");
@@ -74,11 +114,17 @@ class Hud extends FlxTypedGroup<FlxSprite>
 			// makes all the sprites in this group follow the camera
 			sprite.scrollFactor.set(0, 0);
 		});
-		// message the server every 5 minutes and ask if everything's ok bb <3
-		var apiCheck = new FlxTimer().start(300, (timer) ->
+		if (!sacrificeMode)
 		{
-			NG.core.calls.gateway.ping().send();
-		}, 0);
+		// message the server every 5 minutes and ask if everything's ok bb <3
+			if (NG.core != null && NG.core.loggedIn)
+			{
+				new FlxTimer().start(300, (timer) ->
+				{
+					NG.core.calls.gateway.ping().send();
+				}, 0);
+			}
+		}
 	}
 
 	public function updateBar(x:Float)
@@ -96,45 +142,64 @@ class Hud extends FlxTypedGroup<FlxSprite>
 	}
 	public function incScore(add:Int)
 	{
-		score += (add * multiplier);
+		if (sacrificeMode)
+		{
+			score++;
+		}
+		else
+		{
+			score += (add * multiplier);
+		}
+		
 		scoreText.text = Std.string(score);
 	}
 
 	public function setMult(mult:Int)
 	{
-		if (mult == 0 || mult == null)
+		if (!sacrificeMode)
 		{
-			mult = 1;
+			if (mult == 0 || mult == null)
+			{
+				mult = 1;
+			}
+			multiplier = mult;
+			multText.text = "x" + Std.string(multiplier);
 		}
-		multiplier = mult;
-		multText.text = "x" + Std.string(multiplier);
+		else
+		{
+			multiplier = 1;
+		}
 	}
 
 	var sentAPIcall:Bool = false;
 
 	public function gameOver()
 	{
-		gameOverText.visible = true;
-		scoreDesc.visible = true;
-		healthBar.visible = false;
-		multText.visible = false;
-
-		scoreText.x = scoreDesc.x + 90;
-		scoreText.y = scoreDesc.y;
-
-		replayButt.visible = true;
-		menuButton.visible = true;
-		musicText.visible = true;
-		if (!sentAPIcall)
+		if (!sacrificeMode)
 		{
-			sentAPIcall = true;
-			if (NG.core != null && NG.core.loggedIn)
+			gameOverText.visible = true;
+			scoreDesc.visible = true;
+			healthBar.visible = false;
+			multText.visible = false;
+
+			scoreText.x = scoreDesc.x + 90;
+			scoreText.y = scoreDesc.y;
+
+			replayButt.visible = true;
+			menuButton.visible = true;
+			musicText.visible = true;
+			scoreText.size = 8;
+			if (!sentAPIcall)
 			{
-				NG.core.requestScoreBoards(() ->
+				sentAPIcall = true;
+				if (NG.core != null && NG.core.loggedIn)
 				{
-					var scoreBoard = NG.core.scoreBoards.get(10934);
-					scoreBoard.postScore(score);
-				});
+					NG.core.requestScoreBoards(() ->
+					{
+						var scoreBoard = NG.core.scoreBoards.get(10934);
+						scoreBoard.postScore(score);
+					});
+				}
 			}
 		}
 	}
@@ -142,5 +207,52 @@ class Hud extends FlxTypedGroup<FlxSprite>
 	{
 		painOverlay.alpha = 1;
 		FlxTween.tween(painOverlay, {alpha: 0}, 0.5);
+	}
+	public function redScore()
+	{
+		redTeamScore++;
+		redTeamScoreText.text = Std.string(redTeamScore);
+	}
+
+	public function lostGame()
+	{
+		gameOverText.visible = true;
+		gameOverText.text = "You Lose!";
+		scoreDesc.visible = true;
+		healthBar.visible = false;
+		// multText.visible = false;
+
+		scoreText.x = scoreDesc.x + 30;
+		scoreText.y = scoreDesc.y;
+		redTeamDesc.x = scoreText.x + 30;
+		redTeamDesc.y = scoreText.y;
+		redTeamDesc.visible = true;
+		redTeamScoreText.x = redTeamDesc.x + 40;
+		redTeamScoreText.y = redTeamDesc.y;
+
+		replayButt.visible = true;
+		menuButton.visible = true;
+		musicText.visible = true;
+	}
+
+	public function winGame()
+	{
+		gameOverText.visible = true;
+		gameOverText.text = "You Win!";
+		scoreDesc.visible = true;
+		healthBar.visible = false;
+		// multText.visible = false;
+
+		scoreText.x = scoreDesc.x + 30;
+		scoreText.y = scoreDesc.y;
+		redTeamDesc.x = scoreText.x + 30;
+		redTeamDesc.y = scoreText.y;
+		redTeamDesc.visible = true;
+		redTeamScoreText.x = redTeamDesc.x + 40;
+		redTeamScoreText.y = redTeamDesc.y;
+
+		replayButt.visible = true;
+		menuButton.visible = true;
+		musicText.visible = true;
 	}
 }

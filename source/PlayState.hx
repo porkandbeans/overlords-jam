@@ -31,7 +31,7 @@ class PlayState extends FlxState
 	var buddies:FlxTypedGroup<Buddy>;
 	var playerVector:Vector2;
 	var activeFollowers:Int;
-	var overlords:FlxTypedGroup<Overlord>;
+	public var overlords:FlxTypedGroup<Overlord>;
 	var badBullets:FlxGroup; // contains both evil buddy bullets and overlord bullets
 	var buddyBadBullets:FlxGroup; // contains only enemy buddy bullets
 	var hud:Hud;
@@ -43,11 +43,18 @@ class PlayState extends FlxState
 	var mouseSprite:FlxSprite;
 	var hitsound:FlxSound;
 	var painSquares:FlxTypedGroup<FlxObject>;
+	var mapPath:String;
+	var budHit:FlxSound;
 
+	override public function new(_mapPath:String)
+	{
+		super();
+		mapPath = _mapPath;
+	}
 	override public function create()
 	{
 		super.create();
-
+		budHit = FlxG.sound.load("assets/sounds/budHit.wav", 0.5);
 		shootSound = FlxG.sound.load("assets/sounds/blast.wav", 0.5, true);
 		painSound = FlxG.sound.load("assets/sounds/bone.wav", 0.8, false);
 		hitsound = FlxG.sound.load("assets/sounds/hitsound.wav", 0.5, false);
@@ -62,7 +69,7 @@ class PlayState extends FlxState
 		mousePos = new FlxPoint();
 		camFollow = new FlxObject();
 		add(camFollow);
-		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", "assets/data/arena.json");
+		map = new FlxOgmo3Loader("assets/data/Overlords_tilemap_project.ogmo", mapPath);
 
 		tilemap = map.loadTilemap("assets/images/tilemap/tiles.png", "new_layer");
 		tilemap.follow();
@@ -91,7 +98,7 @@ class PlayState extends FlxState
 
 		overlords = new FlxTypedGroup<Overlord>();
 
-		hud = new Hud();
+		hud = new Hud(false);
 		// add(hud); add after everything else
 
 		map.loadEntities(placeEntities, "ents");
@@ -114,6 +121,18 @@ class PlayState extends FlxState
 		add(overlordSpawns);
 		add(painSquares);
 		add(hud);
+		// this updates every buddy in the buddies group with the overlords group every ten seconds (the spawn frequency)
+		/*new FlxTimer().start(0.1, (timm) -> // this should go off once, to stagger the timers
+		{
+			new FlxTimer().start(10, (tim) -> // and this should go off every 10 seconds
+			{
+				buddies.forEach((bud) ->
+				{
+					bud.updateOverlordsGroup(overlords);
+				});
+			}, 0);
+		}, 1);*/
+
 	}
 
 	function addBuddyBullets(buddy:Buddy)
@@ -146,10 +165,10 @@ class PlayState extends FlxState
 				buddies.add(new Buddy(entity.x, entity.y, player, overlords));
 				return;
 			case "overlord":
-				overlords.add(new Overlord(entity.x, entity.y, player));
+				overlords.add(new Overlord(entity.x, entity.y, player, SURVIVAL, null));
 				return;
 			case "buddySpawn":
-				buddySpawns.add(new BuddySpawn(entity.x, entity.y, player, overlords));
+				buddySpawns.add(new BuddySpawn(entity.x, entity.y, player, this));
 				return;
 			case "overlordSpawn":
 				overlordSpawns.add(new OverlordSpawn(entity.x, entity.y, player));
@@ -263,7 +282,7 @@ class PlayState extends FlxState
 		buddies.forEach((buddy:Buddy) ->
 		{
 			buddy.checkPlayerDistance();
-			buddy.followPlayer(player.getMidpoint());
+			// buddy.followPlayer();
 			buddy.rotateAndLookAt(player.getMidpoint(), mouse.getPosition());
 			if (buddy.alive && buddy.state == FOLLOW)
 			{
@@ -315,6 +334,7 @@ class PlayState extends FlxState
 		{
 			if (bud.state == State.EVIL && bul.shooting)
 			{
+				budHit.play(true);
 				// trace("evil buddy just shot by friendly bullet");
 				bul.kill();
 				bud.health--;
@@ -327,7 +347,7 @@ class PlayState extends FlxState
 
 		FlxG.overlap(bulletsg, overlords, (bul, ol) ->
 		{
-			if (bul.shooting)
+			if (bul.shooting && ol.alive)
 			{
 				hitsound.play(true);
 				var pos = new Vector2(ol.x, ol.y);
@@ -359,6 +379,7 @@ class PlayState extends FlxState
 		{
 			if (bud.state == FOLLOW)
 			{
+				budHit.play(true);
 				bul.kill();
 				bud.health--;
 				if (bud.health <= 0)

@@ -32,6 +32,7 @@ class MenuState extends FlxState
 	var musicUpButt:FlxButton;
 	var musicDownButt:FlxButton;
 	var volumeText:FlxText;
+	var sacButton:FlxButton; // sacrifice gamemode
 
 	override public function create()
 	{
@@ -42,11 +43,19 @@ class MenuState extends FlxState
 		background = new FlxBackdrop("assets/images/menuImg.png");
 		add(background);
 
-		playButton = new FlxButton(30, FlxG.height / 2, "PLAY", () ->
+		// === SURVIVAL MODE ===
+		playButton = new FlxButton(30, FlxG.height / 2, "SURVIVAL", () ->
 		{
-			FlxG.switchState(new PlayState());
+			FlxG.switchState(new PlayState("assets/data/arena.json"));
 		});
 		add(playButton);
+
+		// === SACRIFICE MODE ===
+		sacButton = new FlxButton(30, playButton.y + 20, "SACRIFICE", () ->
+		{
+			FlxG.switchState(new Sacrifice("assets/data/sacrifice.json"));
+		});
+		add(sacButton);
 
 		helpButton = new FlxButton(FlxG.width - 120, playButton.y, "HOW TO PLAY", help);
 		add(helpButton);
