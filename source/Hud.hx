@@ -198,6 +198,34 @@ class Hud extends FlxTypedGroup<FlxSprite>
 					{
 						var scoreBoard = NG.core.scoreBoards.get(10934);
 						scoreBoard.postScore(score);
+						NG.core.requestMedals(() ->
+						{
+							if (score >= 100)
+							{
+								var medal = NG.core.medals.get(65914);
+								if (!medal.unlocked)
+								{
+									medal.onUnlock.add(function():Void
+									{
+										trace('${medal.name} unlocked:${medal.unlocked}');
+									});
+									medal.sendUnlock();
+								}
+							}
+
+							if (score >= 1000)
+							{
+								var medal2 = NG.core.medals.get(65915);
+								if (!medal2.unlocked)
+								{
+									medal2.onUnlock.add(function():Void
+									{
+										trace('${medal2.name} unlocked:${medal2.unlocked}');
+									});
+									medal2.sendUnlock();
+								}
+							}
+						});
 					});
 				}
 			}
@@ -254,5 +282,24 @@ class Hud extends FlxTypedGroup<FlxSprite>
 		replayButt.visible = true;
 		menuButton.visible = true;
 		musicText.visible = true;
+		if (!sentAPIcall)
+		{
+			sentAPIcall = true;
+			if (NG.core != null && NG.core.loggedIn)
+			{
+				NG.core.requestMedals(() ->
+				{
+					var medal = NG.core.medals.get(65913);
+					if (!medal.unlocked)
+					{
+						medal.onUnlock.add(function():Void
+						{
+							trace('${medal.name} unlocked:${medal.unlocked}');
+						});
+						medal.sendUnlock();
+					}
+				});
+			}
+		}
 	}
 }

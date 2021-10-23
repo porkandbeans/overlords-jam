@@ -76,14 +76,14 @@ class Overlord extends FlxSprite
 		buddies = new FlxTypedGroup<Buddy>();
 		health = 20;
 		playPoint = new FlxPoint();
-		new FlxTimer().start(5, (tim) ->
+		/*new FlxTimer().start(5, (tim) ->
 		{
 			trace("I am alive: " + alive);
 			trace("My health: " + health);
 			trace("My current state: " + playMode);
 			trace("I am at: " + this.x + " | " + this.y);
 			trace("I am visible: " + visible);
-		}, 0);
+		}, 0);*/
 	}
 
 	/**

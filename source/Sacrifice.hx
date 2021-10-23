@@ -10,6 +10,9 @@ import flixel.util.FlxTimer;
 import haxe.display.Display.Package;
 import lime.math.Vector2;
 
+/**
+	Class loaded as a PlayState for Sacrifice mode, extends PlayState
+**/
 class Sacrifice extends PlayState
 {
 	var playerSpawn:FlxPoint;
@@ -48,6 +51,11 @@ class Sacrifice extends PlayState
 	var gameOver:Bool = false;
 	var playerDead = false;
 
+	/**
+		in Sacrifice mode, the difference is that it checks for score instead of whether or not the player is alive.
+
+		First to 30, spawns a whole bunch of buddies when the player wins. Kills the player when they lose and doesn't let them respawn.
+	**/
 	override function gameOverCheck()
 	{
 		if (!gameOver)
@@ -99,6 +107,9 @@ class Sacrifice extends PlayState
 		}
 	}
 
+	/**
+		some stuff redacted here and added
+	**/
 	override function placeEntities(entity:EntityData)
 	{
 		switch (entity.name)
@@ -108,9 +119,6 @@ class Sacrifice extends PlayState
 				player.y = entity.y;
 				playerSpawn.x = entity.x;
 				playerSpawn.y = entity.y;
-				return;
-			case "buddy":
-				buddies.add(new Buddy(entity.x, entity.y, player, overlords));
 				return;
 			case "buddySpawn":
 				buddySpawns.add(new BuddySpawn(entity.x, entity.y, player, this));
@@ -138,6 +146,9 @@ class Sacrifice extends PlayState
 		}
 	}
 
+	/**
+		No painzones here but instead I used the layer in Ogmo to place the red team and blue team goals
+	**/
 	override function placePainzone(entity:EntityData)
 	{
 		if (entity.name == "sacBlueGoal")
@@ -152,6 +163,10 @@ class Sacrifice extends PlayState
 		}
 	}
 
+	/**
+		this did some important stuff so I couldn't just get rid of it, but I stopped the points from multiplying based on the following buddies
+		I also had to un-spaghetti some stuff here
+	**/
 	override function setMultiplier()
 	{
 		buddies.forEach((buddy:Buddy) ->
@@ -162,27 +177,31 @@ class Sacrifice extends PlayState
 		});
 	}
 
+	/**
+		yeah I still hate this
+	**/
 	override function collidesAndOverlaps()
 	{
-		FlxG.collide(player, tilemap);
-		FlxG.collide(bullets, tilemap, (bul, til) ->
+		FlxG.collide(player, tilemap); // player collides with map
+		FlxG.collide(bullets, tilemap, (bul, til) -> // player bullets collide with map
 		{
 			bul.kill();
 		});
-		FlxG.collide(buddyBullets, tilemap, (bul, til) ->
+		FlxG.collide(buddyBullets, tilemap, (bul, til) -> // buddy bullets colliding with map
 		{
 			bul.kill();
 		});
-		FlxG.collide(tilemap, badBullets, (til, bul) ->
+		FlxG.collide(tilemap, badBullets, (til, bul) -> // enemy bullets colliding with map
 		{
 			bul.kill();
 		});
-		FlxG.collide(tilemap, buddyBadBullets, (til, bul) ->
+		FlxG.collide(tilemap, buddyBadBullets, (til, bul) -> // evil buddy bullets on map
 		{
 			bul.kill();
 		});
-		FlxG.collide(buddies, buddies);
-		FlxG.collide(tilemap, overlords);
+		FlxG.collide(buddies, buddies); // buddies collide with each other
+		FlxG.collide(tilemap, overlords); // overlords collide with map
+		
 		// === PLAYER HIT BY A BULLET ===
 		FlxG.overlap(badBullets, player, (bul, pla) ->
 		{
@@ -222,6 +241,7 @@ class Sacrifice extends PlayState
 				bul.kill();
 			}
 		});
+		// === PLAYER PICKS UP A HEART ===
 		FlxG.overlap(player, hearts, (pl:Player, ht:Heart) ->
 		{
 			if (player.health < 20)
@@ -230,6 +250,7 @@ class Sacrifice extends PlayState
 				hud.updateBar(pl.health);
 			}
 		});
+		// === BUDDY SHOT BY ENEMY BULLET ===
 		FlxG.overlap(buddies, badBullets, (bud, bul) ->
 		{
 			if (bud.state == FOLLOW)
@@ -242,12 +263,6 @@ class Sacrifice extends PlayState
 					bud.kill();
 				}
 			}
-		});
-		// hurt the player in enemy spawn zones
-		FlxG.overlap(player, painSquares, (pl, pa) ->
-		{
-			player.takeDamage(0.001);
-			hud.updateBar(player.health);
 		});
 
 		// === PLAYER SCORED ===
