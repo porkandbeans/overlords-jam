@@ -84,10 +84,10 @@ class MenuState extends FlxState
 		genText = new FlxText(30, 30, FlxG.width,
 			"You are an OVERLORD. Move around with WASD/Arrow keys.\nPoint and click to shoot.\n Hold SHIFT or SPACE to enter PRECISION MODE.");
 		buddySprite = new FlxSprite(30, 80, "assets/images/buddy.png");
-		buddyText = new FlxText(60, 80, FlxG.width, "Move near a buddy to become their OVERLORD.");
+		buddyText = new FlxText(60, 80, FlxG.width - 80, "Move near a buddy to become their OVERLORD.");
 		olSprite = new FlxSprite(30, 110, "assets/images/overlord.png");
-		olText = new FlxText(60, 110,
-			"You must defend yourself against the ENEMY OVERLORDS.\n Kill them to steal their BUDDIES.\n\n\n\nBUDDIES MULTIPLY YOUR SCORE!!!");
+		olText = new FlxText(60, 110, FlxG.width - 80,
+			"You must defend yourself against the ENEMY OVERLORDS.\n Kill them to steal their BUDDIES.\n\nBuddies multiply your score!\n\n\nSACRIFICE MODE: Collect buddies before your enemies do and take them to your GOAL.\nStop your enemies from scoring points by killing\n(or stealing) their buddies. First to 30 points wins.");
 
 		backButton = new FlxButton(30, FlxG.width - 60, "MAIN MENU", closeHelp);
 		add(backButton);
@@ -111,6 +111,7 @@ class MenuState extends FlxState
 		// === main vars
 		playButton.visible = false;
 		helpButton.visible = false;
+		sacButton.visible = false;
 
 		// === help vars ===
 		genText.visible = true;
@@ -120,6 +121,7 @@ class MenuState extends FlxState
 		olText.visible = true;
 		backButton.visible = true;
 
+
 		background.loadGraphic("assets/images/helpBg.png");
 	}
 
@@ -128,6 +130,7 @@ class MenuState extends FlxState
 		// === main vars
 		playButton.visible = true;
 		helpButton.visible = true;
+		sacButton.visible = true;
 
 		// === help vars ===
 		genText.visible = false;
@@ -136,6 +139,7 @@ class MenuState extends FlxState
 		olSprite.visible = false;
 		olText.visible = false;
 		backButton.visible = false;
+
 
 		background.loadGraphic("assets/images/menuImg.png");
 	}

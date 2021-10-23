@@ -16,7 +16,7 @@ class BadBullet extends Bullet
 		shooting = false;
 		this.x = x;
 		this.y = y;
-		FlxVelocity.moveTowardsPoint(this, point);
+		FlxVelocity.moveTowardsPoint(this, point, 180);
 		new FlxTimer().start(0.01, (timer) ->
 		{
 			shooting = true;

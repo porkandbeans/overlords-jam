@@ -82,10 +82,10 @@ class Sacrifice extends PlayState
 		if (player.health <= 0 && !playerDead)
 		{
 			player.kill();
+			player.health = 20;
 			new FlxTimer().start(4, (tim) ->
 			{
 				player.reset(playerSpawn.x, playerSpawn.y);
-				player.health = 20;
 			});
 
 			// set all following buddies to idle
